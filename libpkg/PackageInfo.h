@@ -1,5 +1,6 @@
 //
-// Created by toast on 26.03.16.
+// Copyright (c) Till Wegmueller 2016 under CDDL
+// for License see LICENSE file in root of repository
 //
 
 #ifndef PKG6_PACKAGEINFO_H
@@ -7,9 +8,9 @@
 
 #include "pkgdefs.h"
 #include <string>
-#include <pgtypes_date.h>
 #include "PackageCategory.h"
 #include "LicenseInfo.h"
+
 namespace pkg {
 /*
  * A class capturing the information about packages that a client
@@ -27,32 +28,34 @@ namespace pkg {
         //For other States see pkgdefs.h
         //TODO Check if these two constants need to be moved to pkgdefs.h
     public:
-        std::string pkg_stem;
+        PackageInfo(std::string fmri);
         std::string summary;
-        pkg::PackageCategory categories[];
-        int states[];
+        std::vector<pkg::PackageCategory> categories;
+        std::vector<int> states;
         std::string publisher;
         std::string version;
         std::string build_release;
         std::string branch;
-        date packaging_date;
+        std::tm packaging_date;
+        std::string signature;
         //TODO check what type these could be
         std::string size;
         std::string csize;
         ////
         std::string fmri;
-        LicenseInfo licenses[];
-        //TODO check what types these could be
-        std::string links;
-        std::string hardlinks;
-        std::string files;
-        std::string dirs;
-        std::string dependencies;
-        std::string attrs[];
-        ////
+        std::vector<LicenseInfo> licenses;
+        std::vector<std::string> links;
+        std::vector<std::string> hardlinks;
+        std::vector<std::string> files;
+        std::vector<std::string> dirs;
+        std::vector<std::string> dependencies;
+        std::vector<std::string> attrs;
         std::string description;
-        date last_update;
-        date last_install;
+        std::tm last_update;
+        std::tm last_install;
+
+        void load();
+        void save();
 
     };
 

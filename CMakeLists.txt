@@ -11,7 +11,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/PackageInfo.cpp libpkg/PackageInfo.h
         libpkg/History.cpp libpkg/History.h
         libpkg/HistoryOperation.cpp libpkg/HistoryOperation.h
-        libpkg/Catalog.cpp libpkg/Catalog.h libpkg/CatalogPart.cpp libpkg/CatalogPart.h)
+        libpkg/Catalog.cpp libpkg/Catalog.h)
 add_library(libpkg6 ${LIBPKG_SOURCE_FILES})
 add_library(libtinyxml2 tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
 add_executable(pkg6 main.cpp)
