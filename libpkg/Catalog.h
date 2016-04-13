@@ -8,7 +8,7 @@
 #include <string>
 #include <chrono>
 
-class CatalogBase {
+class Catalog {
 public:
     std::string name;
     std::string sign;
