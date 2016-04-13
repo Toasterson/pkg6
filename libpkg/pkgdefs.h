@@ -1,5 +1,6 @@
 //
-// Created by toast on 26.03.16.
+// Copyright (c) Till Wegmueller 2016 under CDDL
+// for License see LICENSE file in root of repository
 //
 
 #ifndef PKG6_PKGDEFS_H
@@ -28,7 +29,7 @@ namespace pkg {
     static int EXIT_PARENTOP = 54; // Linked operation must be done from parent
 
     // package operations
-    static struct PKG_OP {
+    namespace PKG_OP {
         static std::string ATTACH = "attach-linked";
         static std::string AUDIT_LINKED = "audit-linked";
         static std::string CHANGE_FACET = "change-facet";
@@ -56,7 +57,7 @@ namespace pkg {
         static std::string VERIFY = "verify";
     };
 
-    static struct API_OP {
+    namespace API_OP {
         static std::string ATTACH = "attach-linked";
         static std::string CHANGE_FACET = "change-facet";
         static std::string CHANGE_VARIANT = "change-variant";
@@ -75,14 +76,14 @@ namespace pkg {
         static std::string PURGE_HISTORY = "purge-history";
     };
 
-    static struct API_STAGE {
+    namespace API_STAGE {
         static std::string DEFAULT = "default";
         static std::string PLAN = "plan";
         static std::string PREPARE = "prepare";
         static std::string EXECUTE = "execute";
     };
 
-    static struct PKG_STATE {
+    namespace PKG_STATE {
         /*
          Please note that the values of these PKG_STATE constants should not
          be changed as it would invalidate existing catalog data stored in the
@@ -141,7 +142,7 @@ namespace pkg {
         static int ALT_SOURCE = 99;
     };
 
-    static struct MSG_TYPE {
+    namespace MSG_TYPE {
         // Message types
         static int ERROR = 0;
         static int WARNING = 1;

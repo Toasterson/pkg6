@@ -1,11 +1,12 @@
 #include <iostream>
-#include <History.h>
+#include <ImageConfig.h>
 
 using namespace std;
-using namespace pkg::history;
+using namespace pkg;
 
 int main() {
-
-    cout<<"Hello There!\n";
+    ImageConfig config = ImageConfig("/home/toast/workspace/cpp/pkg6/sample_data/pkg5");
+    //cout<<config.getVariant("variant.arch");
+    cout<<"\nAll Done!\n";
     return 0;
 }

@@ -1,0 +1,6 @@
+dir facet.devel=all group=bin mode=0755 owner=root path=usr/include/caja
+dir facet.devel=all group=bin mode=0755 owner=root path=usr/include/caja/libcaja-extension
+dir group=bin mode=0755 owner=root path=usr/share/caja
+dir group=bin mode=0755 owner=root path=usr/share/caja/patterns
+dir group=bin mode=0755 owner=root path=usr/share/caja/ui
+dir group=bin mode=0755 owner=root path=usr/share/pixmaps/caja

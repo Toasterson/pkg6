@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.4)
 project(pkg6)
 
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED )
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories(tinyxml2 libpkg)
+include_directories(tinyxml2 libpkg simpleini ${Boost_INCLUDE_DIR})
 set(LIBPKG_SOURCE_FILES
         libpkg/Image.cpp libpkg/Image.h
         libpkg/LicenseInfo.cpp libpkg/LicenseInfo.h
@@ -10,10 +12,11 @@ set(LIBPKG_SOURCE_FILES
         libpkg/PackageCategory.cpp libpkg/PackageCategory.h
         libpkg/PackageInfo.cpp libpkg/PackageInfo.h
         libpkg/History.cpp libpkg/History.h
-        libpkg/HistoryOperation.cpp libpkg/HistoryOperation.h
-        libpkg/Catalog.cpp libpkg/Catalog.h libpkg/CatalogPart.cpp libpkg/CatalogPart.h)
-add_library(libpkg6 ${LIBPKG_SOURCE_FILES})
-add_library(libtinyxml2 tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
-add_executable(pkg6 main.cpp)
-target_link_libraries(libpkg6 libtinyxml2 boost_system)
-target_link_libraries(pkg6 libpkg6)
+        libpkg/HistoryOperation.h
+        libpkg/Catalog.cpp libpkg/Catalog.h
+        libpkg/ImageConfig.cpp libpkg/ImageConfig.h
+        simpleini/SimpleIni.h
+        tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp
+        main.cpp)
+add_executable(pkg ${LIBPKG_SOURCE_FILES})
+link_libraries(pkg boost_filesystem boost_system)

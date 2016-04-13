@@ -1,0 +1,4 @@
+link path=usr/lib/amd64/libcaja-extension.so target=libcaja-extension.so.1.4.0
+link path=usr/lib/amd64/libcaja-extension.so.1 target=libcaja-extension.so.1.4.0
+link path=usr/lib/libcaja-extension.so target=libcaja-extension.so.1.4.0
+link path=usr/lib/libcaja-extension.so.1 target=libcaja-extension.so.1.4.0

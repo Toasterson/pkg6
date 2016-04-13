@@ -1,20 +1,20 @@
 //
-// Created by toast on 13.04.16.
+// Copyright (c) Till Wegmueller 2016 under CDDL
+// for License see LICENSE file in root of repository
 //
 
 #include "Catalog.h"
 
-void Catalog::destroy() {
 
-}
 
-bool Catalog::exists() {
-    return false;
-}
 
-bool Catalog::save(std::string &data, bool single_pass) {
-    return false;
-}
+
+
+
+
+
+
+
 
 
 

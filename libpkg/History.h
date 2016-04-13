@@ -1,5 +1,6 @@
 //
-// Created by toast on 26.03.16.
+// Copyright (c) Till Wegmueller 2016 under CDDL
+// for License see LICENSE file in root of repository
 //
 
 #ifndef PKG6_HISTORY_H
@@ -71,18 +72,16 @@ namespace pkg {
             HistoryOperation operation;
 
         public:
-            History(const std::string &root_dir)
-            {
-                this->root_dir = root_dir;
-                client_name = "";
-                client_version = "";
-                client_args = "";
-                operation = HistoryOperation();
-            }
+            History(const std::string &root_dir):
+                    root_dir(root_dir),
+                    client_name(""),
+                    client_version(""),
+                    client_args(""),
+                    operation(HistoryOperation()) { }
 
-            History(const std::string &root_dir, const std::string &filename)
+            History(const std::string &root_dir, const std::string &filename):
+                    root_dir(root_dir)
             {
-                this->root_dir = root_dir;
                 load(filename);
             }
 

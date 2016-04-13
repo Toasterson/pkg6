@@ -1,18 +1,18 @@
 //
-// Created by toast on 26.03.16.
+// Copyright (c) Till Wegmueller 2016 under CDDL
+// for License see LICENSE file in root of repository
 //
 
+
+#include <pkgdefs.h>
 #include <History.h>
 #include <tinyxml2.h>
-#include <pkgdefs.h>
 
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-#include "boost/filesystem/operations.hpp"
-#include "boost/filesystem/path.hpp"
+#define BOOST_SYSTEM_NO_DEPRECATED
+
+#include "boost/filesystem.hpp"
 #include "boost/progress.hpp"
-#include "boost/filesystem/fstream.hpp"
 #include "boost/algorithm/string.hpp"
-#include <iostream>
 #include <iomanip>
 
 namespace fs = boost::filesystem;
@@ -27,7 +27,7 @@ std::string pkg::history::History::pathname() {
  }
  else{
      char buf[sizeof "20160324T215420Z"];
-     strftime(buf, sizeof "20160324T215420Z", ISO8601_PARSE_STRING, operation.start_time);
+     strftime(buf, sizeof "20160324T215420Z", ISO8601_PARSE_STRING, &operation.start_time);
      return path()+"/"+buf+"-01.xml";
  }
 }
@@ -58,7 +58,7 @@ void pkg::history::History::clear() {
     operation = HistoryOperation();
 }
 
-void pkg::history::History::purge(const std::string &be_name = "", const std::string &be_uuid = "") {
+void pkg::history::History::purge(const std::string &be_name, const std::string &be_uuid) {
     operation.name = API_OP::PURGE_HISTORY;
     operation.be = be_name;
     operation.be_uuid = be_uuid;
@@ -78,8 +78,8 @@ void pkg::history::History::logStart(const std::string &name, const std::string 
     operation.be_uuid=be_uuid;
 }
 
-void pkg::history::History::logEnd(const std::string &error = "", const std::string &result = "",
-                                   const std::string &release_notes = "") {
+void pkg::history::History::logEnd(const std::string &error, const std::string &result,
+                                   const std::string &release_notes) {
     if(result=="" and error==""){
         operation.result = RESULT_SUCCEEDED;
     } else if(result == "" and error != ""){
@@ -93,7 +93,7 @@ void pkg::history::History::logEnd(const std::string &error = "", const std::str
     }
 }
 
-void pkg::history::History::logError(const std::string &error = "") {
+void pkg::history::History::logError(const std::string &error) {
     operation.error = error;
 }
 
@@ -142,19 +142,19 @@ void pkg::history::History::save() {
     Xclient->Attribute("version", client_version.c_str());
 
     std::vector<std::string> argstrs;
-    boost::split(argstrs, client_args, " ");
-    for(auto &argstr : argstrs){
+    //boost::split(argstrs, client_args, " ");
+    /*for(auto &argstr : argstrs){
         auto arg = doc.NewElement("arg");
         arg->SetValue(argstr.c_str());
         Xargs->InsertFirstChild(arg);
-    }
+    }*/
 
     Xoper->Attribute("be", operation.be.c_str());
     Xoper->Attribute("be_uuid", operation.be_uuid.c_str());
     char start_time[80] = "", end_time[80] = "", snapshot[80] = "";
-    strftime(start_time, 80, ISO8601_PARSE_STRING, operation.start_time);
-    strftime(end_time, 80, ISO8601_PARSE_STRING, operation.end_time);
-    strftime(snapshot, 80, SNAPSHOT_PARSE_STRING, operation.snapshot);
+    strftime(start_time, 80, ISO8601_PARSE_STRING, &operation.start_time);
+    strftime(end_time, 80, ISO8601_PARSE_STRING, &operation.end_time);
+    strftime(snapshot, 80, SNAPSHOT_PARSE_STRING, &operation.snapshot);
     Xoper->Attribute("start_time", start_time);
     Xoper->Attribute("end_time", end_time);
     Xoper->Attribute("snapshot", snapshot);

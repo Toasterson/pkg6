@@ -1,0 +1,123 @@
+[authority_userland]
+approved_ca_certs = []
+repo.refresh_seconds = 14400
+ssl_key = 
+sticky = True
+disabled = False
+intermediate_certs = []
+prefix = userland
+property.signature-required-names = []
+repo.registration_uri = 
+repo.registered = False
+mirrors = []
+revoked_ca_certs = []
+repo.related_uris = []
+repo.description = 
+signing_ca_certs = []
+repo.legal_uris = []
+origin_info = [{'uri': 'file:///root/workspace/oi-userland/i386/repo/', 'proxy': ''}]
+uuid = d8a30326-ecf9-11e5-8d12-0800273d7df0
+ssl_cert = 
+origins = ['file:///root/workspace/oi-userland/i386/repo/']
+repo.name = 
+repo.sort_policy = priority
+alias = 
+mirror_info = []
+repo.collection_type = core
+
+[CONFIGURATION]
+version = 3
+
+[authority_openindiana.org]
+approved_ca_certs = []
+repo.refresh_seconds = 14400
+ssl_key = 
+sticky = True
+disabled = False
+intermediate_certs = []
+prefix = openindiana.org
+property.signature-required-names = []
+repo.registration_uri = 
+repo.registered = False
+mirrors = []
+revoked_ca_certs = []
+repo.related_uris = []
+repo.description = 
+signing_ca_certs = []
+repo.legal_uris = []
+origin_info = [{'uri': 'http://pkg.openindiana.org/hipster-2015/', 'proxy': ''}]
+uuid = b3996a24-69ba-11e5-ace5-92dc8bd41209
+ssl_cert = 
+origins = ['http://pkg.openindiana.org/hipster-2015/']
+repo.name = 
+repo.sort_policy = priority
+alias = 
+mirror_info = []
+repo.collection_type = core
+
+[image]
+version = 4
+
+[variant]
+variant.opensolaris.zone = global
+variant.arch = i386
+
+[mediators]
+firefox.version = 44
+gcc.version-source = system
+perl.implementation-source = system
+ftpd.version-source = system
+mta.implementation = mailwrapper
+automake.implementation-source = system
+openssl.implementation-source = vendor
+apache.version-source = vendor
+perl.version-source = system
+ftpd.implementation = proftpd
+mysql.version-source = system
+ssh.implementation = sunssh
+clang.implementation-source = system
+system-perl.implementation-source = system
+apache.implementation-source = vendor
+apache.version = 2.2
+gcc.implementation-source = system
+perl.version = 5.22
+clang.version-source = system
+openssl.implementation = default
+automake.version-source = system
+python.version-source = vendor
+openssl.version-source = vendor
+ruby.version = 1.9
+system-perl.version-source = system
+python.implementation-source = vendor
+ruby.implementation-source = vendor
+clang.version = 3.4
+automake.version = 1.15
+system-perl.version = 5.22
+ruby.version-source = vendor
+mysql.implementation = mariadb
+mysql.version = 5.5
+ftpd.implementation-source = system
+firefox.version-source = system
+gcc.version = 4.9
+ssh.version-source = system
+mta.version-source = system
+mysql.implementation-source = system
+mta.implementation-source = system
+firefox.implementation-source = system
+ssh.implementation-source = system
+python.version = 2.6
+
+[property]
+send-uuid = True
+mirror-discovery = False
+preferred-authority = 
+flush-content-cache-on-success = False
+dehydrated = []
+check-certificate-revocation = False
+use-system-repo = False
+content-update-policy = default
+be-policy = default
+publisher-search-order = ['userland', 'openindiana.org']
+signature-required-names = []
+ca-path = /etc/openssl/certs
+
