@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ascii"?><history><client name="pkg" version="e0fb847"><args><arg><![CDATA[/usr/bin/pkg]]></arg><arg><![CDATA[install]]></arg><arg><![CDATA[pkg://openindiana.org/library/desktop/libwnck]]></arg></args></client><operation be="20160308-3" be_uuid="9c2e4b1d-3d50-c508-e77f-c06e98ce47e7" end_time="20160324T215456Z" name="install" result="Succeeded, None" snapshot="2016-03-24-21:54:34" start_time="20160324T215420Z" userid="0" username="root"><start_state><![CDATA[Solver: [ Variables: 893 Clauses: 5421 Iterations: 1 State: Succeeded]
+Timings: [phase 1:  2.255, phase 2:  0.442, phase 3:  0.207, phase 4:  0.000, phase 5:  0.000, phase 6:  0.000, phase 7:  0.053, phase 8:  0.670, phase 9:  0.025, phase 10:  0.040, phase 11:  0.080, phase 12:  0.016, phase 13:  0.017, phase 14:  0.000, phase 15:  0.191, phase 16:  0.048]
+Maintained incorporations: pkg://openindiana.org/consolidation/cns/cns-incorporation@0.5.11,5.11-2013.0.0.0:20151027T055701Z
+	pkg://openindiana.org/consolidation/X/X-incorporation@0.5.11,5.11-2015.0.2.0:20160118T151923Z
+	pkg://openindiana.org/consolidation/install/install-incorporation@0.5.11,5.11-2015.0.2.971:20151222T100407Z
+	pkg://openindiana.org/consolidation/hcts/hcts-incorporation@0.5.11,5.11-2013.0.0.0:20151027T055705Z
+	pkg://openindiana.org/consolidation/cde/cde-incorporation@0.5.11,5.11-2013.0.0.0:20151027T055700Z
+	pkg://openindiana.org/consolidation/solaris_re/solaris_re-incorporation@0.5.11,5.11-2015.0.2.0:20151027T090344Z
+	pkg://openindiana.org/consolidation/osnet/osnet-incorporation@0.5.11,5.11-2015.0.2.15531:20160317T210157Z
+	pkg://openindiana.org/consolidation/nspg/nspg-incorporation@0.5.11,5.11-2014.1.0.0:20151027T090315Z
+
+Package version changes:
+None -> pkg://openindiana.org/library/desktop/libwnck@2.30.7,5.11-2015.0.2.3:20151109T142606Z
+]]></start_state><end_state><![CDATA[None -> pkg://openindiana.org/library/desktop/libwnck@2.30.7,5.11-2015.0.2.3:20151109T142606Z
+]]></end_state></operation></history>
