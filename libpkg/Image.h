@@ -1,6 +1,5 @@
 //
-// Copyright (c) Till Wegmueller 2016 under CDDL
-// for License see LICENSE file in root of repository
+// Created by toast on 25.03.16.
 //
 
 #ifndef PKG6_IMAGE_H
