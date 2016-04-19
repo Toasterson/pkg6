@@ -8,17 +8,19 @@
 
 #include <string>
 #include <map>
-#include "../simpleini/SimpleIni.h"
+#include <vector>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 namespace pkg {
     class ImageConfig {
     private:
         const std::string IMAGE_CONFIG_FILENAME = "pkg5.image";
         std::string root;
-        //CSimpleIniA ini;
+        boost::property_tree::ptree pt;
         void upgrade_format();
     public:
-        /*std::string getVariant(std::string name);
+        std::string getVariant(std::string name);
         std::string getFacet(std::string name);
         std::string getPublisher(std::string name);
         std::string getMediator(std::string name);
@@ -28,12 +30,12 @@ namespace pkg {
         std::vector<std::string> getSectionFacet(std::vector<std::string>& filter);
         std::vector<std::string> getSectionPublisher(std::vector<std::string>& filter);
         std::vector<std::string> getSectionMediator(std::vector<std::string>& filter);
-        std::vector<std::string> getSectionImage(std::vector<std::string>& filter);*/
+        std::vector<std::string> getSectionImage(std::vector<std::string>& filter);
 
         ImageConfig()= default;
         ImageConfig(const std::string &root);
-        //void load();
-        //void save();
+        void load();
+        void save();
     };
 };
 
