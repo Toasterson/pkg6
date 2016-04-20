@@ -1,0 +1,19 @@
+{
+  "package-version-count": 861,
+  "version": 1,
+  "created": "20160324T215350.028651Z",
+  "last-modified": "20160324T215350.028651Z",
+  "parts": {
+    "catalog.summary.C": {
+      "last-modified": "20160324T215434.391052Z"
+    },
+    "catalog.base.C": {
+      "last-modified": "20160324T215434.391052Z"
+    },
+    "catalog.dependency.C": {
+      "last-modified": "20160324T215434.391052Z"
+    }
+  },
+  "updates": {},
+  "package-count": 861
+}

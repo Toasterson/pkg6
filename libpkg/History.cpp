@@ -177,6 +177,18 @@ void pkg::history::History::save() {
     doc.SaveFile(pathname().c_str());
 }
 
+void pkg::history::History::upgrade_format(const std::string &newRoot) {
+
+}
+
+void pkg::history::History::importpkg5() {
+
+}
+
+
+
+
+
 
 
 

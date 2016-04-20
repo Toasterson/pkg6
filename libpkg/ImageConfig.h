@@ -18,7 +18,7 @@ namespace pkg {
         const std::string IMAGE_CONFIG_FILENAME = "pkg5.image";
         std::string root;
         boost::property_tree::ptree pt;
-        void upgrade_format();
+        void importpkg5();
     public:
         std::string getVariant(std::string name);
         std::string getFacet(std::string name);
@@ -36,6 +36,7 @@ namespace pkg {
         ImageConfig(const std::string &root);
         void load();
         void save();
+        void upgrade_format(const std::string &newRoot = "");
     };
 };
 

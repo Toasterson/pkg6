@@ -10,7 +10,7 @@ std::string pkg::Image::getImgDir(){
 }
 
 std::string pkg::Image::getImgRoot() {
-    return "";
+    return image_root;
 }
 
 
@@ -23,8 +23,7 @@ std::string pkg::Image::getWriteCachePath() {
 }
 
 std::string pkg::Image::getArch() {
-    //return config.getVariant("variant.arch");
-    return "";
+    return config.getVariant("variant.arch");
 }
 
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
@@ -47,10 +46,6 @@ int pkg::Image::getImageType() {
     return 0;
 }
 
-void pkg::Image::upgrade_format(const bool &allow_unprevileged) {
-
-}
-
 void pkg::Image::create(const bool &is_zone, const std::vector<std::string> &publishers, const bool &refresh_allowed,
                         const std::map<std::string, std::string> &properties,
                         const std::map<std::string, std::string> &variants,
@@ -61,6 +56,25 @@ void pkg::Image::create(const bool &is_zone, const std::vector<std::string> &pub
 std::tm pkg::Image::getLastModified() {
     return tm();
 }
+
+void pkg::Image::upgrade_format(const std::string &newRoot) {
+    if(newRoot == ""){
+        //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
+        image_root = IMAGE_ROOT_PATH;
+    } else {
+        image_root = newRoot;
+    }
+    history.upgrade_format(newRoot);
+    config.upgrade_format(newRoot);
+}
+
+void pkg::Image::importpkg5() {
+
+}
+
+
+
+
 
 
 

@@ -9,9 +9,11 @@
 #include <vector>
 #include "History.h"
 #include "ImageConfig.h"
+#include "Catalog.h"
 
 namespace pkg {
     class Image {
+        const std::string IMAGE_ROOT_PATH = "/var/pkg";
         /*
          * An Image object is a directory tree containing the laid-down contents
             of a self-consistent graph of Packages.
@@ -44,8 +46,12 @@ namespace pkg {
         bool blocking_locks;
         pkg::ImageConfig config;
         pkg::history::History history;
+        pkg::Catalog installed;
+        pkg::Catalog known;
         int version;
         bool locked;
+        std::string image_root;
+        void importpkg5();
 
 
         //TODO Check Type
@@ -74,7 +80,7 @@ namespace pkg {
         void lock(const bool &allow_unprevileged = false);
         void unlock();
         int getImageType();
-        void upgrade_format(const bool &allow_unprevileged);
+        void upgrade_format(const std::string &newRoot = "");
         /*
          * Creates a new image with the given attributes if it does not
            exist; should not be used with an existing image.

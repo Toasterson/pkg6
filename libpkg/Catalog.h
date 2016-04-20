@@ -10,27 +10,30 @@
 #include <chrono>
 #include <map>
 #include "PackageInfo.h"
+#include "boost/property_tree/ptree.hpp"
 
 namespace pkg {
 
     class Catalog {
-        const std::string FILE_NAME = "catalog.json";
-        const std::string SIG_FILE_NAME = "signatures.json";
+        const std::string KNOWN_CATALOG_FILENAME = "known.catalog";
+        const std::string INSTALLED_CATALOG_FILENAME = "installed.catalog";
+        const std::string GENERIC_CATALOG_FILENAME = "catalog.info";
 
     private:
-        bool batch_mode;
         bool read_only;
         bool do_sign;
         std::string signature;
         std::string root_dir;
         std::tm last_modified;
-        std::map<std::string,pkg::PackageInfo> packages;
+        std::string catalogtype;
+        boost::property_tree::ptree data;
+        void importpkg5();
     public:
 
-        Catalog(bool batch_mode = false,
-                std::string root = "",
-                bool read_only = false,
-                bool do_sign = false);
+        Catalog(const std::string &root = "",
+                const std::string &catalogtype = "generic",
+                const bool &read_only = false,
+                const bool &do_sign = false);
 
 
         bool isRead_only() const {
@@ -45,23 +48,19 @@ namespace pkg {
             return last_modified;
         }
 
-        const std::map<std::string, PackageInfo> &getPackages() const {
-            return packages;
-        }
+        void upgrade_format(const std::string &newRoot ="");
 
         void destroy();
 
         bool exists();
 
-        bool load();
-
-        bool importpkg5();
+        void load();
 
         std::string fullpath();
 
-        bool save();
+        void save();
 
-        bool finalize();
+        void finalize();
 
 
     };

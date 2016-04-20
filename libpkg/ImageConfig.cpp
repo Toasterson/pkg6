@@ -60,9 +60,15 @@ std::vector<std::string> pkg::ImageConfig::getSectionImage(std::vector<std::stri
     return std::vector<std::__cxx11::string>();
 }
 
-void pkg::ImageConfig::upgrade_format() {
+void pkg::ImageConfig::upgrade_format(const std::string &newRoot) {
 
 }
+
+void pkg::ImageConfig::importpkg5() {
+
+}
+
+
 
 
 

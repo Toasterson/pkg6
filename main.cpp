@@ -1,12 +1,12 @@
 #include <iostream>
-#include <ImageConfig.h>
+#include <Catalog.h>
 
 using namespace std;
 using namespace pkg;
 
 int main() {
-    ImageConfig config = ImageConfig("/home/toast/workspace/cpp/pkg6/sample_data/pkg5");
-    cout<<config.getVariant("variant.arch");
+    Catalog installed = Catalog("/home/toast/workspace/cpp/pkg6/sample_data/pkg5/state/installed");
+    installed.save();
     cout<<"\nAll Done!\n";
     return 0;
 }

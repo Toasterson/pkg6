@@ -121,6 +121,9 @@ namespace pkg {
         static int V0 = 6;
         static int V1 = 7;
 
+        //Newly Introduced by pkg6
+        static int V2 = 12;
+
         static int OBSOLETE = 8;
         static int RENAMED = 9;
 

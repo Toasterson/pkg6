@@ -71,6 +71,8 @@ namespace pkg {
             //The Operations performed during this history action
             HistoryOperation operation;
 
+            void importpkg5();
+
         public:
             History(const std::string &root_dir):
                     root_dir(root_dir),
@@ -178,6 +180,8 @@ namespace pkg {
             void load(const std::string &filename);
 
             void save();
+
+            void upgrade_format(const std::string &newRoot = "");
 
         };
     };
