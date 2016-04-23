@@ -9,8 +9,11 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <boost/property_tree/ptree.hpp>
 #include "PackageCategory.h"
 #include "LicenseInfo.h"
+
+using namespace boost::property_tree;
 
 namespace pkg {
 /*
@@ -29,8 +32,6 @@ namespace pkg {
         //For other States see pkgdefs.h
         //TODO Check if these two constants need to be moved to pkgdefs.h
     public:
-        PackageInfo(std::string fmri);
-        std::string summary;
         std::vector<pkg::PackageCategory> categories;
         std::vector<int> states;
         std::string publisher;
@@ -38,25 +39,46 @@ namespace pkg {
         std::string build_release;
         std::string branch;
         std::tm packaging_date;
-        std::string signature;
         //TODO check what type these could be
         std::string size;
         std::string csize;
         ////
-        std::string fmri;
+        std::string name;
         std::vector<LicenseInfo> licenses;
-        std::vector<std::string> links;
-        std::vector<std::string> hardlinks;
-        std::vector<std::string> files;
-        std::vector<std::string> dirs;
-        std::vector<std::string> dependencies;
-        std::vector<std::string> attrs;
-        std::string description;
         std::tm last_update;
         std::tm last_install;
 
-        void load();
-        void save();
+        ptree attrs, links, files, dirs, dependencies;
+
+        std::string getDescription(){
+            return attrs.get<std::string>("description");
+        }
+
+        void setDescription(const std::string& desc){
+            attrs.put("description", desc);
+        }
+
+        std::string getSummary(){
+            return attrs.get<std::string>("summary");
+        }
+
+        void setSummary(const std::string& sum){
+            attrs.put("summary", sum);
+        }
+
+        void setSignature(const std::string& sig){
+            attrs.put("signature-sha-1", sig);
+        }
+
+        std::string getSignature(){
+            return attrs.get<std::string>("signature-sha-1");
+        }
+
+        void addAttr(const std::string& set_string);
+
+        std::string getFmri(){
+            return publisher + "/" + name + "/" + version;
+        }
 
     };
 

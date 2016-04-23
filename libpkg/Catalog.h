@@ -15,23 +15,20 @@
 namespace pkg {
 
     class Catalog {
-        const std::string KNOWN_CATALOG_FILENAME = "known.catalog";
-        const std::string INSTALLED_CATALOG_FILENAME = "installed.catalog";
-        const std::string GENERIC_CATALOG_FILENAME = "catalog.info";
 
     private:
         bool read_only;
         bool do_sign;
         std::string signature;
         std::string root_dir;
+        std::string name;
         std::tm last_modified;
-        std::string catalogtype;
-        boost::property_tree::ptree data;
-        void importpkg5();
+
+        void importpkg5(const std::string& importDir);
     public:
 
         Catalog(const std::string &root = "",
-                const std::string &catalogtype = "generic",
+                const std::string &name = "",
                 const bool &read_only = false,
                 const bool &do_sign = false);
 
@@ -52,16 +49,19 @@ namespace pkg {
 
         void destroy();
 
+        void create();
+
+        void addPackage(pkg::PackageInfo& pkg);
+
+        void removePackage(const pkg::PackageInfo& pkg);
+
+        pkg::PackageInfo getPackage(const std::string& name);
+
+        std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& names);
+
         bool exists();
 
-        void load();
-
-        std::string fullpath();
-
-        void save();
-
-        void finalize();
-
+        std::string path();
 
     };
 };
