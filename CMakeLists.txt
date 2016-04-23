@@ -13,7 +13,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/HistoryOperation.h
         libpkg/Catalog.cpp libpkg/Catalog.h
         libpkg/ImageConfig.cpp libpkg/ImageConfig.cpp
-        )
+        libpkg/Progress.h)
 add_library(libpkg6 ${LIBPKG_SOURCE_FILES})
 add_library(libtinyxml2 tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)
