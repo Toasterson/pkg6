@@ -58,7 +58,7 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
                 pkg.publisher = publisher_name;
                 pkg.name = package_name;
                 pkg.version = package_version.second.get<std::string>("version");
-                pkg.setSignature(package_version.second.get<std::string>("signature-sha-1"));
+                pkg.signature = package_version.second.get<std::string>("signature-sha-1");
 
                 for (auto package_state : package_version.second.get_child("metadata.states")){
                     pkg.states.push_back(package_state.second.get<int>(""));
@@ -91,7 +91,7 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
                         if (package_version.second.get<std::string>("version") ==
                                 package_summary_version.second.get<std::string>("version")) {
                             for (auto package_summary_action: package_summary_version.second.get_child("actions")) {
-                                pkg.addAttr(package_summary_action.second.get<std::string>(""));
+                                pkg.addAction(package_summary_action.second.get<std::string>(""));
                             }
                         }
                     }
@@ -111,10 +111,16 @@ void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
         fs::create_directories(fs::system_complete(pkg_path));
     }
     //write attrs file
-    write_info(pkg_path_str+"/attrs", pkg.attrs);
+    std::ofstream attrStream = std::ofstream(pkg_path_str + "/attrs");
+    for(auto attr: pkg.attrs) {
+        write_info(attrStream, attr.data);
+    }
 
     //Write dependency file
-    write_info(pkg_path_str+"/dep", pkg.dependencies);
+    std::ofstream depStream = std::ofstream(pkg_path_str + "/dep");
+    for(auto dep: pkg.dependencies) {
+        write_info(depStream, dep.data);
+    }
 }
 
 void pkg::Catalog::removePackage(const pkg::PackageInfo &pkg) {

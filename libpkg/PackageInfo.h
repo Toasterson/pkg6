@@ -12,6 +12,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include "PackageCategory.h"
 #include "LicenseInfo.h"
+#include "Action.h"
+#include <boost/tokenizer.hpp>
 
 using namespace boost::property_tree;
 
@@ -36,6 +38,7 @@ namespace pkg {
         std::vector<int> states;
         std::string publisher;
         std::string version;
+        std::string signature;
         std::string build_release;
         std::string branch;
         std::tm packaging_date;
@@ -48,37 +51,39 @@ namespace pkg {
         std::tm last_update;
         std::tm last_install;
 
-        ptree attrs, links, files, dirs, dependencies;
+
+
+        std::vector<Action> attrs, links, files, dirs, dependencies;
 
         std::string getDescription(){
-            return attrs.get<std::string>("description");
-        }
+            for(Action act: attrs){
+                try {
+                    return act.get("description");
+                }
+                catch (int e){
 
-        void setDescription(const std::string& desc){
-            attrs.put("description", desc);
+                }
+            }
+            return "";
         }
 
         std::string getSummary(){
-            return attrs.get<std::string>("summary");
-        }
+            for(Action act: attrs){
+                try {
+                    return act.get("summary");
+                }
+                catch (int e){
 
-        void setSummary(const std::string& sum){
-            attrs.put("summary", sum);
+                }
+            }
+            return "";
         }
-
-        void setSignature(const std::string& sig){
-            attrs.put("signature-sha-1", sig);
-        }
-
-        std::string getSignature(){
-            return attrs.get<std::string>("signature-sha-1");
-        }
-
-        void addAttr(const std::string& set_string);
 
         std::string getFmri(){
             return publisher + "/" + name + "/" + version;
         }
+
+        void addAction(const std::string& action_string);
 
     };
 
