@@ -29,8 +29,8 @@ std::string pkg::Image::getArch() {
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     history(pkg::history::History(root)),
     config(pkg::ImageConfig(root)),
-    installed(pkg::Catalog(root, "installed.db")),
-    known(pkg::Catalog(root, "known.db")),
+    installed(pkg::Catalog(root, "installed")),
+    //known(pkg::Catalog(root, "known")),
     allow_ondisk_upgrade(allow_ondisk_upgrade)
 {
 
@@ -67,7 +67,7 @@ void pkg::Image::upgrade_format(std::string newRoot) {
     history.upgrade_format(newRoot);
     config.upgrade_format(newRoot);
     installed.upgrade_format(newRoot);
-    known.upgrade_format(newRoot);
+    //known.upgrade_format(newRoot);
 }
 
 void pkg::Image::importpkg5() {

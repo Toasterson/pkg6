@@ -148,7 +148,5 @@ namespace pkg {
         static int WARNING = 1;
         static int INFO = 2;
     };
-
-
 };
 #endif //PKG6_PKGDEFS_H

@@ -10,7 +10,7 @@ namespace fs = boost::filesystem;
 using namespace boost::property_tree;
 
 void pkg::Catalog::upgrade_format(const std::string &newRoot) {
-    std::string importDir = root_dir;
+    std::string importDir = root_dir + "/state/" + name;
     root_dir = newRoot;
     read_only = false;
     importpkg5(importDir);
