@@ -37,7 +37,7 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
     read_json(importDir + "/catalog.dependency.C", catalog_dependency);
     read_json(importDir + "/catalog.summary.C", catalog_summary);
 
-    Progress progress = Progress("importing pkg5 metadata into "+name, "packages", catalog_attrs.get<int>("package-version-count"));
+    Progress progress = Progress("importing pkg5 metadata into " + name + " catalog", "packages", catalog_attrs.get<int>("package-version-count"));
 
     for (auto publisher : catalog_base){
         std::string publisher_name = publisher.first;
