@@ -9,6 +9,17 @@
 #include <string>
 #include <HistoryOperation.h>
 #include <map>
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+#include <tinyxml2.h>
+#include <pkgdefs.h>
+#define BOOST_SYSTEM_NO_DEPRECATED
+#include "boost/filesystem.hpp"
+#include "boost/progress.hpp"
+#include "boost/algorithm/string.hpp"
+#include <iomanip>
 
 namespace pkg {
     namespace history {
@@ -50,6 +61,29 @@ namespace pkg {
 
         // Operations that are discarded, not saved, when recorded by history.
         const std::string DISCARDED_OPERATIONS[] = {"contents", "info", "list"};
+
+        namespace misc {
+            const char *ISO8601_PARSE_STRING = "%Y%m%dT%H%M%SZ";
+            const char *SNAPSHOT_PARSE_STRING = "%Y-%m-%d-%H:%M:%S";
+
+            // trim from start
+            static inline std::string &ltrim(std::string &s) {
+                s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+                return s;
+            }
+
+            // trim from end
+            static inline std::string &rtrim(std::string &s) {
+                s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+                        s.end());
+                return s;
+            }
+
+            // trim from both ends
+            static inline std::string &trim(std::string &s) {
+                return ltrim(rtrim(s));
+            }
+        };
 
 
         class History {

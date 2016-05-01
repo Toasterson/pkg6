@@ -8,7 +8,11 @@
 pkg::ImageConfig::ImageConfig(const std::string &root):
     root(root)
 {
-    load();
+    if(boost::filesystem::is_regular_file((root + "/" + IMAGE_CONFIG_OLDFILENAME).c_str())){
+        importpkg5();
+    } else {
+        load();
+    }
 }
 
 void pkg::ImageConfig::load() {
@@ -61,11 +65,11 @@ std::vector<std::string> pkg::ImageConfig::getSectionImage(std::vector<std::stri
 }
 
 void pkg::ImageConfig::upgrade_format(const std::string &newRoot) {
-
+    boost::property_tree::ini_parser::write_ini((newRoot + "/" + IMAGE_CONFIG_FILENAME).c_str(), pt);
 }
 
 void pkg::ImageConfig::importpkg5() {
-
+    boost::property_tree::ini_parser::read_ini((root + "/" + IMAGE_CONFIG_OLDFILENAME).c_str(), pt);
 }
 
 

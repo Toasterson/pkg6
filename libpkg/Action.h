@@ -25,7 +25,11 @@ namespace pkg {
 
         std::string get(const std::string &key);
 
-        void put(const std::string &key, std::string &value);
+        void put(const std::string &key, const std::string &value);
+
+        bool hasKey(const std::string& key);
+
+        void update(const std::string& key, const std::string& value);
 
         std::string type;
 

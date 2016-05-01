@@ -85,6 +85,8 @@ namespace pkg {
 
         void addAction(const std::string& action_string);
 
+        void addAction(const Action& action);
+
     };
 
 };

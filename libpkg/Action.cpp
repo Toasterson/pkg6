@@ -47,13 +47,34 @@ std::string pkg::Action::toActionString() {
     return "";
 }
 
-void pkg::Action::put(const std::string &key, std::string &value) {
+void pkg::Action::put(const std::string &key, const std::string &value) {
     data.put(ptree::path_type(key, '\\'), value);
 }
 
 std::string pkg::Action::get(const std::string &key) {
     return data.get<std::string>(ptree::path_type(key, '\\'));
 }
+
+bool pkg::Action::hasKey(const std::string &key) {
+    boost::optional<ptree&> optree = data.get_child_optional(ptree::path_type(key, '\\'));
+    if(optree){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void pkg::Action::update(const std::string &key, const std::string &value) {
+    if(hasKey(key)){
+        put(key, value);
+    }
+}
+
+
+
+
+
+
 
 
 

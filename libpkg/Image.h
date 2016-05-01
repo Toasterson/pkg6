@@ -7,9 +7,9 @@
 
 #include <string>
 #include <vector>
-#include "History.h"
-#include "ImageConfig.h"
-#include "Catalog.h"
+#include <History.h>
+#include <ImageConfig.h>
+#include <Catalog.h>
 
 namespace pkg {
     class Image {
@@ -80,7 +80,7 @@ namespace pkg {
         void lock(const bool &allow_unprevileged = false);
         void unlock();
         int getImageType();
-        void upgrade_format(const std::string &newRoot = "");
+        void upgrade_format(std::string newRoot = "");
         /*
          * Creates a new image with the given attributes if it does not
            exist; should not be used with an existing image.

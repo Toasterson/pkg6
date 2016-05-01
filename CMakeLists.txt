@@ -16,7 +16,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/Progress.h
         libpkg/Manifest.cpp libpkg/Manifest.h libpkg/Action.cpp libpkg/Action.h)
 add_library(libpkg6 ${LIBPKG_SOURCE_FILES})
-add_library(libtinyxml2 tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
+add_library(libtinyxml2 STATIC tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)
 target_link_libraries(libpkg6 libtinyxml2 boost_filesystem)
 target_link_libraries(pkg libpkg6)

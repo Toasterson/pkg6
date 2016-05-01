@@ -8,12 +8,18 @@
 
 void pkg::PackageInfo::addAction(const std::string &action_string) {
     Action action = Action(action_string);
+    addAction(action);
+}
+
+void pkg::PackageInfo::addAction(const Action &action) {
     if(action.type == "set"){
         attrs.push_back(action);
     } else if(action.type == "depend"){
         dependencies.push_back(action);
     }
 }
+
+
 
 
 

@@ -3,14 +3,19 @@
 // for License see LICENSE file in root of repository
 //
 
-#ifndef PKG6_CATALOGPARTBASE_H
-#define PKG6_CATALOGPARTBASE_H
+#ifndef PKG6_CATALOG_H
+#define PKG6_CATALOG_H
 
 #include <string>
 #include <chrono>
 #include <map>
 #include "PackageInfo.h"
 #include "boost/property_tree/ptree.hpp"
+#include <Progress.h>
+#define BOOST_SYSTEM_NO_DEPRECATED
+#include <boost/filesystem.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/info_parser.hpp>
 
 namespace pkg {
 

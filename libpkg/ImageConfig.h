@@ -11,11 +11,13 @@
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
+#include <boost/filesystem/operations.hpp>
 
 namespace pkg {
     class ImageConfig {
     private:
-        const std::string IMAGE_CONFIG_FILENAME = "pkg5.image";
+        const std::string IMAGE_CONFIG_OLDFILENAME = "pkg5.image";
+        const std::string IMAGE_CONFIG_FILENAME = "pkg6.image";
         std::string root;
         boost::property_tree::ptree pt;
         void importpkg5();

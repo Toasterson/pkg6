@@ -3,14 +3,8 @@
 // for License see LICENSE file in root of repository
 //
 
-#include <pkgdefs.h>
 #include "Catalog.h"
-#include <archive.h>
-#include <Progress.h>
-#define BOOST_SYSTEM_NO_DEPRECATED
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/info_parser.hpp>
+
 
 namespace fs = boost::filesystem;
 using namespace boost::property_tree;
@@ -43,7 +37,7 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
     read_json(importDir + "/catalog.dependency.C", catalog_dependency);
     read_json(importDir + "/catalog.summary.C", catalog_summary);
 
-    Progress progress = Progress("importing pkg5 metadata", "packages", catalog_attrs.get<int>("package-version-count"));
+    Progress progress = Progress("importing pkg5 metadata into "+name, "packages", catalog_attrs.get<int>("package-version-count"));
 
     for (auto publisher : catalog_base){
         std::string publisher_name = publisher.first;
@@ -66,23 +60,18 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
 
                 //TODO dependency parser
 
-                /*
                 boost::optional<ptree&> check_package_dependency = catalog_dependency.get_child_optional(ptree::path_type(base_path, '\\'));
                 if(check_package_dependency) {
                     ptree package_dependency = catalog_dependency.get_child(ptree::path_type(base_path, '\\'));
                     for (auto package_dependency_version: package_dependency) {
-                        int dependency_count = 1;
                         if (package_version.second.get<std::string>("version") ==
                             package_dependency_version.second.get<std::string>("version")) {
                             for (auto package_dependency_action: package_dependency_version.second.get_child("actions")) {
-                                //data.put(ptree::path_type(data_path+"\\dependencies\\"+std::to_string(dependency_count), '\\'), package_dependency_action.second.get<std::string>(""));
-                                dependency_count++;
+                                pkg.addAction(package_dependency_action.second.get<std::string>(""));
                             }
-                            dependency_count = 1;
                         }
                     }
                 }
-                */
 
                 boost::optional<ptree&> check_package_summary = catalog_summary.get_child_optional(ptree::path_type(base_path, '\\'));
                 if(check_package_summary) {
@@ -104,27 +93,33 @@ void pkg::Catalog::importpkg5(const std::string& importDir) {
 }
 
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
-    //Write Directory Structure of Package if does not exist
-    std::string pkg_path_str = (path()+"/"+pkg.publisher+"/"+pkg.name+"/"+pkg.version);
-    fs::path pkg_path = fs::system_complete(pkg_path_str.c_str());
-    if(!fs::is_directory(pkg_path)){
-        fs::create_directories(fs::system_complete(pkg_path));
-    }
-    //write attrs file
-    std::ofstream attrStream = std::ofstream(pkg_path_str + "/attrs");
-    for(auto attr: pkg.attrs) {
-        write_info(attrStream, attr.data);
-    }
+    if(!read_only) {
+        //Write Directory Structure of Package if does not exist
+        std::string pkg_path_str = (path() + "/" + pkg.publisher + "/" + pkg.name + "/" + pkg.version);
+        fs::path pkg_path = fs::system_complete(pkg_path_str.c_str());
+        if (!fs::is_directory(pkg_path)) {
+            fs::create_directories(pkg_path);
+        }
+        //write attrs file
+        std::ofstream attrStream = std::ofstream(pkg_path_str + "/attrs");
+        for (auto attr: pkg.attrs) {
+            write_info(attrStream, attr.data);
+        }
 
-    //Write dependency file
-    std::ofstream depStream = std::ofstream(pkg_path_str + "/dep");
-    for(auto dep: pkg.dependencies) {
-        write_info(depStream, dep.data);
+        //Write dependency file
+        std::ofstream depStream = std::ofstream(pkg_path_str + "/dep");
+        for (auto dep: pkg.dependencies) {
+            write_info(depStream, dep.data);
+        }
     }
 }
 
 void pkg::Catalog::removePackage(const pkg::PackageInfo &pkg) {
-
+    std::string pkg_path_str = (path() + "/" + pkg.publisher + "/" + pkg.name + "/" + pkg.version);
+    fs::path pkg_path = fs::system_complete(pkg_path_str.c_str());
+    if(fs::is_directory(pkg_path)){
+        fs::remove_all(pkg_path);
+    }
 }
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &name) {
@@ -132,5 +127,5 @@ pkg::PackageInfo pkg::Catalog::getPackage(const std::string &name) {
 }
 
 std::string pkg::Catalog::path() {
-    return root_dir + "/" + name;
+    return root_dir + "/state/" + name;
 }

@@ -29,6 +29,8 @@ std::string pkg::Image::getArch() {
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     history(pkg::history::History(root)),
     config(pkg::ImageConfig(root)),
+    installed(pkg::Catalog(root, "installed.db")),
+    known(pkg::Catalog(root, "known.db")),
     allow_ondisk_upgrade(allow_ondisk_upgrade)
 {
 
@@ -57,15 +59,15 @@ std::tm pkg::Image::getLastModified() {
     return tm();
 }
 
-void pkg::Image::upgrade_format(const std::string &newRoot) {
+void pkg::Image::upgrade_format(std::string newRoot) {
     if(newRoot == ""){
         //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
-        image_root = IMAGE_ROOT_PATH;
-    } else {
-        image_root = newRoot;
+        newRoot = IMAGE_ROOT_PATH;
     }
     history.upgrade_format(newRoot);
     config.upgrade_format(newRoot);
+    installed.upgrade_format(newRoot);
+    known.upgrade_format(newRoot);
 }
 
 void pkg::Image::importpkg5() {

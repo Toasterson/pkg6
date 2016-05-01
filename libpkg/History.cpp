@@ -4,16 +4,9 @@
 //
 
 
-#include <pkgdefs.h>
+
 #include <History.h>
-#include <tinyxml2.h>
 
-#define BOOST_SYSTEM_NO_DEPRECATED
-
-#include "boost/filesystem.hpp"
-#include "boost/progress.hpp"
-#include "boost/algorithm/string.hpp"
-#include <iomanip>
 
 namespace fs = boost::filesystem;
 
@@ -27,7 +20,7 @@ std::string pkg::history::History::pathname() {
  }
  else{
      char buf[sizeof "20160324T215420Z"];
-     strftime(buf, sizeof "20160324T215420Z", ISO8601_PARSE_STRING, &operation.start_time);
+     strftime(buf, sizeof "20160324T215420Z", misc::ISO8601_PARSE_STRING, &operation.start_time);
      return path()+"/"+buf+"-01.xml";
  }
 }
@@ -111,14 +104,14 @@ void pkg::history::History::load(const std::string &filename) {
         client_args.append(element->GetText());
         client_args.append(" ");
     }
-    ltrim(client_args);
+    misc::ltrim(client_args);
     operation = HistoryOperation();
     XMLElement* oper = history->FirstChildElement("operation");
     operation.be = oper->Attribute("be");
     operation.be_uuid = oper->Attribute("be_uuid");
-    strptime(oper->Attribute("start_time"), ISO8601_PARSE_STRING, &operation.start_time);
-    strptime(oper->Attribute("end_time"), ISO8601_PARSE_STRING, &operation.end_time);
-    strptime(oper->Attribute("snapshot"), SNAPSHOT_PARSE_STRING, &operation.snapshot);
+    strptime(oper->Attribute("start_time"), misc::ISO8601_PARSE_STRING, &operation.start_time);
+    strptime(oper->Attribute("end_time"), misc::ISO8601_PARSE_STRING, &operation.end_time);
+    strptime(oper->Attribute("snapshot"), misc::SNAPSHOT_PARSE_STRING, &operation.snapshot);
     operation.be_uuid = oper->Attribute("be_uuid");
     operation.name = oper->Attribute("name");
     operation.result = oper->Attribute("result");
@@ -152,9 +145,9 @@ void pkg::history::History::save() {
     Xoper->Attribute("be", operation.be.c_str());
     Xoper->Attribute("be_uuid", operation.be_uuid.c_str());
     char start_time[80] = "", end_time[80] = "", snapshot[80] = "";
-    strftime(start_time, 80, ISO8601_PARSE_STRING, &operation.start_time);
-    strftime(end_time, 80, ISO8601_PARSE_STRING, &operation.end_time);
-    strftime(snapshot, 80, SNAPSHOT_PARSE_STRING, &operation.snapshot);
+    strftime(start_time, 80, misc::ISO8601_PARSE_STRING, &operation.start_time);
+    strftime(end_time, 80, misc::ISO8601_PARSE_STRING, &operation.end_time);
+    strftime(snapshot, 80, misc::SNAPSHOT_PARSE_STRING, &operation.snapshot);
     Xoper->Attribute("start_time", start_time);
     Xoper->Attribute("end_time", end_time);
     Xoper->Attribute("snapshot", snapshot);
