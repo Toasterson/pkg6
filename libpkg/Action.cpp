@@ -24,23 +24,25 @@ void pkg::Action::parseActionString(const std::string &action_string) {
         }
         iter++;
     }
-    if(key != "") {
-        if(values.size() > 1) {
-            for (int it = 0; it < values.size(); it++) {
-                std::string val = values.at((unsigned long) it);
-                if (boost::algorithm::contains(val, "=")) {
-                    std::vector<std::string> kv = std::vector<std::string>();
-                    boost::algorithm::split(kv, val, boost::algorithm::is_any_of("="));
-                    data.put(ptree::path_type((key + "\\" + kv.front()), '\\'), kv.back());
-                } else {
-                    data.put(ptree::path_type(key + "\\" + std::to_string(it), '\\'), val);
-                }
-            }
-        } else {
-            std::string val = values.front();
-            data.put(ptree::path_type(key, '\\'), val);
-        }
+    if(key == "") {
+        key = type;
     }
+    if(values.size() > 1) {
+        for (int it = 0; it < values.size(); it++) {
+            std::string val = values.at((unsigned long) it);
+            if (boost::algorithm::contains(val, "=")) {
+                std::vector<std::string> kv = std::vector<std::string>();
+                boost::algorithm::split(kv, val, boost::algorithm::is_any_of("="));
+                data.put(ptree::path_type((key + "\\" + kv.front()), '\\'), kv.back());
+            } else {
+                data.put(ptree::path_type(key + "\\" + std::to_string(it), '\\'), val);
+            }
+        }
+    } else {
+        std::string val = values.front();
+        data.put(ptree::path_type(key, '\\'), val);
+    }
+
 }
 
 std::string pkg::Action::toActionString() {
