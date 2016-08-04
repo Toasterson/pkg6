@@ -3,7 +3,10 @@
 // for License see LICENSE file in root of repository
 //
 
+#include <boost/filesystem.hpp>
 #include "Image.h"
+
+namespace fs = boost::filesystem;
 
 std::string pkg::Image::getImgDir(){
     return "";
@@ -29,8 +32,8 @@ std::string pkg::Image::getArch() {
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     history(pkg::history::History(root)),
     config(pkg::ImageConfig(root)),
-    installed(pkg::Catalog(root, "installed")),
-    //known(pkg::Catalog(root, "known")),
+    //installed(pkg::Catalog(root, "installed")),
+    known(pkg::Catalog(root, "known")),
     allow_ondisk_upgrade(allow_ondisk_upgrade)
 {
 
@@ -64,10 +67,13 @@ void pkg::Image::upgrade_format(std::string newRoot) {
         //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
         newRoot = IMAGE_ROOT_PATH;
     }
+    if(!fs::is_directory(fs::system_complete(newRoot))){
+        fs::create_directories(fs::system_complete(newRoot));
+    }
     history.upgrade_format(newRoot);
     config.upgrade_format(newRoot);
-    installed.upgrade_format(newRoot);
-    //known.upgrade_format(newRoot);
+    //installed.upgrade_format(newRoot);
+    known.upgrade_format(newRoot);
 }
 
 void pkg::Image::importpkg5() {

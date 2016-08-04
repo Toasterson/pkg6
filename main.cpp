@@ -5,8 +5,8 @@ using namespace std;
 using namespace pkg;
 
 int main() {
-    Image img = Image("/home/toast/workspace/cpp/pkg6/sample_data/pkg5");
-    img.upgrade_format("/home/toast/workspace/cpp/pkg6/sample_data/pkg6");
+    Image img = Image("/home/toast/workspace/illumos/ips/pkg5/");
+    img.upgrade_format("/home/toast/workspace/illumos/ips/pkg6");
 
     cout << "All Done!" << endl;
     return 0;

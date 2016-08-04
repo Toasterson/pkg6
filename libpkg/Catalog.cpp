@@ -4,16 +4,46 @@
 //
 
 #include "Catalog.h"
-
+#include <filereadstream.h>
+#include <document.h>
+#include <reader.h>
+#include <PKG5ImportHandler/CatalogBaseHandler.h>
+#include <istreamwrapper.h>
+#include <writer.h>
+#include <ostreamwrapper.h>
 
 namespace fs = boost::filesystem;
 using namespace boost::property_tree;
+using namespace rapidjson;
 
 void pkg::Catalog::upgrade_format(const std::string &newRoot) {
     std::string importDir = root_dir + "/state/" + name;
     root_dir = newRoot;
     read_only = false;
-    importpkg5(importDir);
+    if(!fs::is_directory(fs::system_complete(statePath()))){
+        fs::create_directories(fs::system_complete(statePath()));
+    }
+    // The json files from pkg5 are huge one needs to read it with a stream reader.
+
+    std::ifstream attrifstream((importDir + "/catalog.attrs").c_str());
+    IStreamWrapper isw(attrifstream);
+    Document catalog_attrs;
+    catalog_attrs.ParseStream(isw);
+    int package_count = catalog_attrs["package-version-count"].GetUint();
+
+    for(std::string json_file : {"/catalog.base.C", "/catalog.dependency.C", "/catalog.summary.C"}) {
+        Progress progress = Progress("importing pkg5 metadata from "+ json_file +" into catalog " + name, "packages", package_count);
+        FILE *fp = fopen((importDir + json_file).c_str(), "r");
+        char readBuffer[65536];
+        FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+        if(json_file == "/catalog.base.C"){
+            //TODO Handler for dependency and summary
+            CatalogBaseHandler handler = CatalogBaseHandler(*this, progress);
+            Reader catalog_reader;
+            catalog_reader.Parse(is, handler);
+        }
+        fclose(fp);
+    }
 }
 
 pkg::Catalog::Catalog(const std::string &root, const std::string &name, const bool &read_only, const bool &do_sign):
@@ -22,110 +52,75 @@ pkg::Catalog::Catalog(const std::string &root, const std::string &name, const bo
     read_only(read_only),
     do_sign(do_sign)
 {
-    //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format is in pkg5 format import into memory
-    // As the Catlog in pkg6 will always reside on disk a load will not be required
+    //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
+    // As the Catalog in pkg6 will always reside on disk a load is not required
     if(fs::is_regular_file(fs::system_complete((root_dir+"/catalog.attrs").c_str()))){
         this->read_only = true;
-    }
-}
-
-void pkg::Catalog::importpkg5(const std::string& importDir) {
-
-    ptree catalog_attrs, catalog_base, catalog_dependency, catalog_summary;
-    read_json(importDir + "/catalog.attrs", catalog_attrs);
-    read_json(importDir + "/catalog.base.C", catalog_base);
-    read_json(importDir + "/catalog.dependency.C", catalog_dependency);
-    read_json(importDir + "/catalog.summary.C", catalog_summary);
-
-    Progress progress = Progress("importing pkg5 metadata into " + name + " catalog", "packages", catalog_attrs.get<int>("package-version-count"));
-
-    for (auto publisher : catalog_base){
-        std::string publisher_name = publisher.first;
-
-        for(auto package : publisher.second){
-            std::string package_name = package.first;
-
-            for(auto package_version : package.second){
-                std::string base_path = publisher_name+"\\"+package_name;
-
-                pkg::PackageInfo pkg = pkg::PackageInfo();
-                pkg.publisher = publisher_name;
-                pkg.name = package_name;
-                pkg.version = package_version.second.get<std::string>("version");
-                pkg.signature = package_version.second.get<std::string>("signature-sha-1");
-
-                for (auto package_state : package_version.second.get_child("metadata.states")){
-                    pkg.states.push_back(package_state.second.get<int>(""));
-                }
-
-                //TODO dependency parser
-
-                boost::optional<ptree&> check_package_dependency = catalog_dependency.get_child_optional(ptree::path_type(base_path, '\\'));
-                if(check_package_dependency) {
-                    ptree package_dependency = catalog_dependency.get_child(ptree::path_type(base_path, '\\'));
-                    for (auto package_dependency_version: package_dependency) {
-                        if (package_version.second.get<std::string>("version") ==
-                            package_dependency_version.second.get<std::string>("version")) {
-                            for (auto package_dependency_action: package_dependency_version.second.get_child("actions")) {
-                                pkg.addAction(package_dependency_action.second.get<std::string>(""));
-                            }
-                        }
-                    }
-                }
-
-                boost::optional<ptree&> check_package_summary = catalog_summary.get_child_optional(ptree::path_type(base_path, '\\'));
-                if(check_package_summary) {
-                    ptree package_summary = catalog_summary.get_child(ptree::path_type(base_path, '\\'));
-                    for (auto package_summary_version: package_summary) {
-                        if (package_version.second.get<std::string>("version") ==
-                                package_summary_version.second.get<std::string>("version")) {
-                            for (auto package_summary_action: package_summary_version.second.get_child("actions")) {
-                                pkg.addAction(package_summary_action.second.get<std::string>(""));
-                            }
-                        }
-                    }
-                }
-                addPackage(pkg);
-                progress++;
-            }
-        }
     }
 }
 
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //Write Directory Structure of Package if does not exist
-        std::string pkg_path_str = (path() + "/" + pkg.publisher + "/" + pkg.name + "/" + pkg.version);
-        fs::path pkg_path = fs::system_complete(pkg_path_str.c_str());
+        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getPath()).c_str());
         if (!fs::is_directory(pkg_path)) {
             fs::create_directories(pkg_path);
         }
-        //write attrs file
-        std::ofstream attrStream = std::ofstream(pkg_path_str + "/attrs");
-        for (auto attr: pkg.attrs) {
-            write_info(attrStream, attr.data);
-        }
+        savePackage(pkg);
+    }
+}
 
-        //Write dependency file
-        std::ofstream depStream = std::ofstream(pkg_path_str + "/dep");
-        for (auto dep: pkg.dependencies) {
-            write_info(depStream, dep.data);
+void pkg::Catalog::updatePackage(pkg::PackageInfo &updatePkg) {
+    if(!read_only){
+        //Make new Object with minimal data from updatePkg
+        PackageInfo pkg(updatePkg);
+        //Load from disk
+        loadPackage(pkg);
+        //Use += to merge with second pkg instance overwriting first
+        pkg += updatePkg;
+        //Save New Package data
+        savePackage(pkg);
+    }
+}
+
+void pkg::Catalog::addOrUpdatePackage(pkg::PackageInfo &pkg) {
+    if(fs::is_directory(fs::system_complete((statePath() + "/" + pkg.getPath()).c_str()))){
+        updatePackage(pkg);
+    } else {
+        addPackage(pkg);
+    }
+}
+
+void pkg::Catalog::removePackage(pkg::PackageInfo &pkg) {
+    if(!read_only) {
+        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getPath()).c_str());
+        if (fs::is_directory(pkg_path)) {
+            fs::remove_all(pkg_path);
         }
     }
 }
 
-void pkg::Catalog::removePackage(const pkg::PackageInfo &pkg) {
-    std::string pkg_path_str = (path() + "/" + pkg.publisher + "/" + pkg.name + "/" + pkg.version);
-    fs::path pkg_path = fs::system_complete(pkg_path_str.c_str());
-    if(fs::is_directory(pkg_path)){
-        fs::remove_all(pkg_path);
-    }
+void pkg::Catalog::savePackage(pkg::PackageInfo &pkg) {
+    //Save Package to disk as one json per package
+    ofstream ofs(statePath()+"/"+pkg.getFilePath());
+    OStreamWrapper osw(ofs);
+    Writer<OStreamWrapper> writer(osw);
+    pkg.Serialize(writer);
 }
 
-pkg::PackageInfo pkg::Catalog::getPackage(const std::string &name) {
+void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
+    ifstream ifs(statePath()+"/"+pkg.getFilePath());
+    IStreamWrapper isw(ifs);
+    Document doc;
+    doc.ParseStream(isw);
+    pkg.Deserialize(doc);
+}
+
+pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
+    //TODO Implement
     return pkg::PackageInfo();
 }
 
-std::string pkg::Catalog::path() {
+std::string pkg::Catalog::statePath() {
     return root_dir + "/state/" + name;
 }

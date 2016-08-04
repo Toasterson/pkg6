@@ -65,7 +65,8 @@ std::vector<std::string> pkg::ImageConfig::getSectionImage(std::vector<std::stri
 }
 
 void pkg::ImageConfig::upgrade_format(const std::string &newRoot) {
-    boost::property_tree::ini_parser::write_ini((newRoot + "/" + IMAGE_CONFIG_FILENAME).c_str(), pt);
+    std::string filename = newRoot + "/" + IMAGE_CONFIG_FILENAME;
+    boost::property_tree::ini_parser::write_ini((filename).c_str(), pt);
 }
 
 void pkg::ImageConfig::importpkg5() {

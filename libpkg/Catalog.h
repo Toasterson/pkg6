@@ -29,7 +29,6 @@ namespace pkg {
         std::string name;
         std::tm last_modified;
 
-        void importpkg5(const std::string& importDir);
     public:
 
         Catalog(const std::string &root = "",
@@ -58,15 +57,23 @@ namespace pkg {
 
         void addPackage(pkg::PackageInfo& pkg);
 
-        void removePackage(const pkg::PackageInfo& pkg);
+        void updatePackage(pkg::PackageInfo& updatePkg);
 
-        pkg::PackageInfo getPackage(const std::string& name);
+        void addOrUpdatePackage(pkg::PackageInfo& pkg);
 
-        std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& names);
+        void removePackage(pkg::PackageInfo& pkg);
+
+        void savePackage(pkg::PackageInfo& pkg);
+
+        void loadPackage(pkg::PackageInfo& pkg);
+
+        pkg::PackageInfo getPackage(const std::string& fmri);
+
+        std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& fmris);
 
         bool exists();
 
-        std::string path();
+        std::string statePath();
 
     };
 };
