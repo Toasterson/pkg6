@@ -14,7 +14,8 @@ set(LIBPKG_SOURCE_FILES
         libpkg/Catalog.cpp libpkg/Catalog.h
         libpkg/ImageConfig.cpp libpkg/ImageConfig.cpp
         libpkg/Progress.h
-        libpkg/Manifest.cpp libpkg/Manifest.h libpkg/Action.cpp libpkg/Action.h libpkg/PKG5ImportHandler/CatalogBaseHandler.h)
+        libpkg/Manifest.cpp libpkg/Manifest.h libpkg/Action.cpp libpkg/Action.h
+        libpkg/PKG5ImportHandler/CatalogBaseHandler.h libpkg/PKG5ImportHandler/CatalogActionHandler.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)

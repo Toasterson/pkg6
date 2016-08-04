@@ -5,6 +5,7 @@
 
 #include "PackageInfo.h"
 #include <Action.h>
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -23,34 +24,38 @@ void pkg::PackageInfo::addAction(const Action &action) {
 
 pkg::PackageInfo pkg::PackageInfo::operator+=(pkg::PackageInfo &alternate) {
     if(!alternate.states.empty()){
-        this->states = alternate.states;
+        for(int state : alternate.states){
+            if(std::find(states.begin(), states.end(), state) == states.end()) {
+                states.push_back(state);
+            }
+        }
     }
 
     if(!alternate.categories.empty()){
-        this->categories = alternate.categories;
+        this->categories.insert(std::end(this->categories), std::begin(alternate.categories), std::end(alternate.categories));
     }
 
     if(!alternate.attrs.empty()){
-        this->attrs = alternate.attrs;
+        this->attrs.insert(std::end(this->attrs), std::begin(alternate.attrs), std::end(alternate.attrs));
     }
 
     if(!alternate.links.empty()){
-        this->links = alternate.links;
+        this->links.insert(std::end(this->links), std::begin(alternate.links), std::end(alternate.links));
     }
 
     if(!alternate.files.empty()){
-        this->files = alternate.files;
+        this->files.insert(std::end(this->files), std::begin(alternate.files), std::end(alternate.files));
     }
 
     if(!alternate.dirs.empty()){
-        this->dirs = alternate.dirs;
+        this->dirs.insert(std::end(this->dirs), std::begin(alternate.dirs), std::end(alternate.dirs));
     }
 
     if(!alternate.dependencies.empty()){
-        this->dependencies = alternate.dependencies;
+        this->dependencies.insert(std::end(this->dependencies), std::begin(alternate.dependencies), std::end(alternate.dependencies));
     }
 
-    if(alternate.signature != this->signature){
+    if(!alternate.signature.empty()){
         this->signature = alternate.signature;
     }
 

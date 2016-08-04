@@ -64,26 +64,10 @@ namespace pkg {
         }
 
         std::string getDescription(){
-            for(Action act: attrs){
-                try {
-                    return act.get("description");
-                }
-                catch (int e){
-
-                }
-            }
             return "";
         }
 
         std::string getSummary(){
-            for(Action act: attrs){
-                try {
-                    return act.get("summary");
-                }
-                catch (int e){
-
-                }
-            }
             return "";
         }
 
@@ -109,31 +93,70 @@ namespace pkg {
         void Serialize(Writer& writer) const{
             writer.StartObject();
             writer.String("publisher");
-            writer.String(publisher);
+            writer.String(publisher.c_str());
             writer.String("name");
-            writer.String(name);
+            writer.String(name.c_str());
             writer.String("version");
-            writer.String(version);
+            writer.String(version.c_str());
             writer.String("signature");
-            writer.String(signature);
+            writer.String(signature.c_str());
             writer.String("states");
             writer.StartArray();
             for(int state : states){
                 writer.Int(state);
             }
             writer.EndArray();
+            writer.String("attrs");
+            writer.StartArray();
+            for(Action attr : attrs){
+                attr.Serialize(writer);
+            }
+            writer.EndArray();
+            writer.String("dependencies");
+            writer.StartArray();
+            for(Action dep : dependencies){
+                dep.Serialize(writer);
+            }
+            writer.EndArray();
             writer.EndObject();
         }
 
-        template <typename Document>
-        void Deserialize(Document& doc){
-            if(doc.IsObject()){
-                this->publisher = doc["publisher"].GetString();
-                this->name = doc["name"].GetString();
-                this->version = doc["signature"].GetString();
-                Value& states = doc["states"];
+        void Deserialize(const Value& rootValue){
+            if(rootValue.IsObject()){
+                this->publisher = rootValue["publisher"].GetString();
+                this->name = rootValue["name"].GetString();
+                this->version = rootValue["version"].GetString();
+                this->signature = rootValue["signature"].GetString();
+                const Value& states = rootValue["states"];
                 for (Value::ConstValueIterator itr = states.Begin(); itr != states.End(); ++itr){
                     this->states.push_back(itr->GetInt());
+                }
+                if (rootValue.HasMember("attrs"))
+                {
+                    const Value& attrs = rootValue["attrs"];
+                    if (attrs.IsArray())
+                    {
+                        for (rapidjson::SizeType i = 0; i < attrs.Size(); i++)
+                        {
+                            Action attr;
+                            attr.Deserialize(attrs[i]);
+                            this->attrs.push_back(attr);
+                        }
+                    }
+                }
+
+                if (rootValue.HasMember("dependencies"))
+                {
+                    const Value& dependencies = rootValue["dependencies"];
+                    if (dependencies.IsArray())
+                    {
+                        for (rapidjson::SizeType i = 0; i < dependencies.Size(); i++)
+                        {
+                            Action dep;
+                            dep.Deserialize(dependencies[i]);
+                            this->dependencies.push_back(dep);
+                        }
+                    }
                 }
             }
         }

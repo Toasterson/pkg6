@@ -14,6 +14,7 @@ private:
     std::ostream& stream;
     int max;
     int current;
+    static const int statusprint = 5;
     std::string pre_text;
     std::string post_text;
     void writeStatus(){
@@ -37,7 +38,13 @@ public:
     void setMax(const int& max){this->max=max;}
     int operator+=(const int& count){
         current += count;
-        writeStatus();
+        if(current % statusprint == 0) {
+            writeStatus();
+        }
+        if(current == count){
+            writeStatus();
+            stream << "\n";
+        }
         return current;
     }
 
