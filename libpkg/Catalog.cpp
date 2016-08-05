@@ -65,7 +65,7 @@ pkg::Catalog::Catalog(const std::string &root, const std::string &name, const bo
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //Write Directory Structure of Package if does not exist
-        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getPath()).c_str());
+        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getFilePath()).c_str()).parent_path();
         if (!fs::is_directory(pkg_path)) {
             fs::create_directories(pkg_path);
         }
@@ -87,7 +87,7 @@ void pkg::Catalog::updatePackage(pkg::PackageInfo &updatePkg) {
 }
 
 void pkg::Catalog::addOrUpdatePackage(pkg::PackageInfo &pkg) {
-    if(fs::is_directory(fs::system_complete((statePath() + "/" + pkg.getPath()).c_str()))){
+    if(fs::is_directory(fs::system_complete((statePath() + "/" + pkg.getFilePath()).c_str()).parent_path())){
         updatePackage(pkg);
     } else {
         addPackage(pkg);
@@ -96,7 +96,7 @@ void pkg::Catalog::addOrUpdatePackage(pkg::PackageInfo &pkg) {
 
 void pkg::Catalog::removePackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
-        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getPath()).c_str());
+        fs::path pkg_path = fs::system_complete((statePath() + "/" + pkg.getFilePath()).c_str()).parent_path();
         if (fs::is_directory(pkg_path)) {
             fs::remove_all(pkg_path);
         }

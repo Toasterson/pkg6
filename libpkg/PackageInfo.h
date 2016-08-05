@@ -75,10 +75,6 @@ namespace pkg {
             return publisher + "/" + name + "@" + version;
         }
 
-        std::string getPath(){
-            return publisher + "/" + name;
-        }
-
         std::string getFilePath() {
             return getFmri() + ".json";
         }
@@ -139,7 +135,7 @@ namespace pkg {
                         for (rapidjson::SizeType i = 0; i < attrs.Size(); i++)
                         {
                             Action attr;
-                            attr.Deserialize(attrs[i]);
+                            attr.Deserialize(attrs[i], "set");
                             this->attrs.push_back(attr);
                         }
                     }
@@ -153,7 +149,7 @@ namespace pkg {
                         for (rapidjson::SizeType i = 0; i < dependencies.Size(); i++)
                         {
                             Action dep;
-                            dep.Deserialize(dependencies[i]);
+                            dep.Deserialize(dependencies[i], "depend");
                             this->dependencies.push_back(dep);
                         }
                     }

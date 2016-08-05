@@ -17,8 +17,6 @@ using namespace rapidjson;
 
 namespace pkg {
     class Action {
-    private:
-        //const std::string action_types[5] = {"set", "depend", "dir", "file", "license", "link"};
     public:
         Action(){}
         Action(const std::string& action_string){
@@ -31,28 +29,23 @@ namespace pkg {
 
         std::string type;
 
-        std::vector<std::string> data;
+        std::map<std::string,std::string> data;
 
         template <typename Writer>
         void Serialize(Writer& writer) const{
             writer.StartObject();
-            writer.String("type");
-            writer.String(type.c_str());
-            writer.String("data");
-            writer.StartArray();
-            for(std::string val : data){
-                writer.String(val.c_str());
+            for(auto item : data){
+                writer.String(item.first.c_str());
+                writer.String(item.second.c_str());
             }
-            writer.EndArray();
             writer.EndObject();
         }
 
-        void Deserialize(const Value& rootVal){
+        void Deserialize(const Value& rootVal, const std::string& type){
+            this->type = type;
             if(rootVal.IsObject()){
-                this->type = rootVal["type"].GetString();
-                const Value& value = rootVal["data"];
-                for (Value::ConstValueIterator itr = value.Begin(); itr != value.End(); ++itr){
-                    this->data.push_back(itr->GetString());
+                for (Value::ConstMemberIterator itr = rootVal.MemberBegin(); itr != rootVal.MemberEnd(); ++itr){
+                    data[itr->name.GetString()] = itr->value.GetString();
                 }
             }
         }
