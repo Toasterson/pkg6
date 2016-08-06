@@ -12,12 +12,15 @@
 #include <boost/property_tree/ptree.hpp>
 #include "PackageCategory.h"
 #include "image/LicenseInfo.h"
-#include "action/Action.h"
 #include <boost/tokenizer.hpp>
 #include <document.h>
+#include <action/AttributeAction.h>
+#include <action/DependAction.h>
+#include <action/DirectoryAction.h>
 
 using namespace boost::property_tree;
 using namespace rapidjson;
+using namespace  pkg::action;
 
 namespace pkg {
 /*
@@ -53,10 +56,13 @@ namespace pkg {
         std::tm last_update;
         std::tm last_install;
 
-        std::vector<Action> attrs, links, files, dirs, dependencies;
+        std::vector<AttributeAction> attrs;
+        std::vector<DependAction> dependencies;
+        std::vector<DirectoryAction> dirs;
+        std::vector<AttributeAction> links;
+        std::vector<AttributeAction> files;
 
         PackageInfo(){}
-
         PackageInfo(const std::string& publisher, const std::string& name, const std::string& version): publisher(publisher), name(name), version(version){}
         PackageInfo(const PackageInfo& origin): publisher(origin.publisher), name(origin.name), version(origin.version){}
         PackageInfo(const std::string& FMRI){
@@ -81,8 +87,6 @@ namespace pkg {
 
         void addAction(const std::string& action_string);
 
-        void addAction(const Action& action);
-
         PackageInfo operator+=(PackageInfo& alternate);
 
         template <typename Writer>
@@ -104,13 +108,13 @@ namespace pkg {
             writer.EndArray();
             writer.String("attrs");
             writer.StartArray();
-            for(Action attr : attrs){
+            for(auto attr : attrs){
                 attr.Serialize(writer);
             }
             writer.EndArray();
             writer.String("dependencies");
             writer.StartArray();
-            for(Action dep : dependencies){
+            for(auto dep : dependencies){
                 dep.Serialize(writer);
             }
             writer.EndArray();
@@ -134,8 +138,8 @@ namespace pkg {
                     {
                         for (rapidjson::SizeType i = 0; i < attrs.Size(); i++)
                         {
-                            Action attr;
-                            attr.Deserialize(attrs[i], "set");
+                            AttributeAction attr;
+                            attr.Deserialize(attrs[i]);
                             this->attrs.push_back(attr);
                         }
                     }
@@ -148,8 +152,8 @@ namespace pkg {
                     {
                         for (rapidjson::SizeType i = 0; i < dependencies.Size(); i++)
                         {
-                            Action dep;
-                            dep.Deserialize(dependencies[i], "depend");
+                            DependAction dep;
+                            dep.Deserialize(dependencies[i]);
                             this->dependencies.push_back(dep);
                         }
                     }

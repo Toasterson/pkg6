@@ -9,47 +9,38 @@
 #include <string>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
-#include <document.h>
 #include <map>
 #include <writer.h>
+#include <document.h>
+#include "Exception.h"
 
 using namespace rapidjson;
 
 namespace pkg {
-    class Action {
-    public:
-        Action(){}
-        Action(const std::string& action_string){
-            parseActionString(action_string);
-        }
+    namespace action {
+        class Action {
+        public:
 
-        void parseActionString(const std::string &action_string);
+            const std::string action_type;
 
-        std::string toActionString();
+            Action() {}
 
-        std::string type;
-
-        std::map<std::string,std::string> data;
-
-        template <typename Writer>
-        void Serialize(Writer& writer) const{
-            writer.StartObject();
-            for(auto item : data){
-                writer.String(item.first.c_str());
-                writer.String(item.second.c_str());
+            Action(const std::string &action_string) {
+                parseActionString(action_string);
             }
-            writer.EndObject();
-        }
 
-        void Deserialize(const Value& rootVal, const std::string& type){
-            this->type = type;
-            if(rootVal.IsObject()){
-                for (Value::ConstMemberIterator itr = rootVal.MemberBegin(); itr != rootVal.MemberEnd(); ++itr){
-                    data[itr->name.GetString()] = itr->value.GetString();
-                }
-            }
-        }
+            virtual void parseActionString(const std::string &action_string){}
 
-    };
+            virtual std::string toActionString(){ return ""; }
+
+            template <typename Writer>
+            void Serialize(Writer& writer) const{}
+
+            virtual void Deserialize(const Value& rootValue){}
+
+            virtual bool validate() { return true; }
+
+        };
+    }
 };
 #endif //PKG6_ACTION_H
