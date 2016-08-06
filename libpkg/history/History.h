@@ -7,7 +7,7 @@
 #define PKG6_HISTORY_H
 
 #include <string>
-#include <HistoryOperation.h>
+#include <history/HistoryOperation.h>
 #include <map>
 #include <algorithm>
 #include <functional>

@@ -10,14 +10,14 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <Catalog.h>
+#include <catalog/Catalog.h>
 
 using namespace std;
 using namespace rapidjson;
 
 namespace pkg {
-    struct CatalogActionHandler : public BaseReaderHandler<UTF8<>, CatalogActionHandler> {
-        CatalogActionHandler(Catalog& catalog, Progress& progress) : state_(kExpectObjectStart), catalog(catalog), progress(progress) {}
+    struct V1DependencySummaryHandler : public BaseReaderHandler<UTF8<>, V1DependencySummaryHandler> {
+        V1DependencySummaryHandler(Catalog& catalog, Progress& progress) : state_(kExpectObjectStart), catalog(catalog), progress(progress) {}
 
         Catalog catalog;
 

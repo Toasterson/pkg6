@@ -9,7 +9,7 @@
 #include <string>
 #include <chrono>
 #include <map>
-#include "PackageInfo.h"
+#include "package/PackageInfo.h"
 #include "boost/property_tree/ptree.hpp"
 #include <Progress.h>
 #define BOOST_SYSTEM_NO_DEPRECATED

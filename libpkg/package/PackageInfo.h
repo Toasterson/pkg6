@@ -11,8 +11,8 @@
 #include <ctime>
 #include <boost/property_tree/ptree.hpp>
 #include "PackageCategory.h"
-#include "LicenseInfo.h"
-#include "Action.h"
+#include "image/LicenseInfo.h"
+#include "action/Action.h"
 #include <boost/tokenizer.hpp>
 #include <document.h>
 

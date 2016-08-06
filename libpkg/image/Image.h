@@ -7,9 +7,9 @@
 
 #include <string>
 #include <vector>
-#include <History.h>
-#include <ImageConfig.h>
-#include <Catalog.h>
+#include <history/History.h>
+#include <image/ImageConfig.h>
+#include <catalog/Catalog.h>
 
 namespace pkg {
     class Image {

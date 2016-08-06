@@ -5,8 +5,8 @@
 
 #include "Catalog.h"
 #include <filereadstream.h>
-#include <PKG5ImportHandler/CatalogBaseHandler.h>
-#include <PKG5ImportHandler/CatalogActionHandler.h>
+#include <catalog/parser/V1BaseHandler.h>
+#include <catalog/parser/V1DependencySummaryHandler.h>
 #include <istreamwrapper.h>
 #include <writer.h>
 #include <ostreamwrapper.h>
@@ -37,11 +37,11 @@ void pkg::Catalog::upgrade_format(const std::string &newRoot) {
         FileReadStream is(fp, readBuffer, sizeof(readBuffer));
         if(json_file == "/catalog.base.C"){
             //TODO Handler for summary
-            CatalogBaseHandler handler = CatalogBaseHandler(*this, progress);
+            V1BaseHandler handler = V1BaseHandler(*this, progress);
             Reader catalog_reader;
             catalog_reader.Parse(is, handler);
         } else {
-            CatalogActionHandler handler = CatalogActionHandler(*this, progress);
+            V1DependencySummaryHandler handler = V1DependencySummaryHandler(*this, progress);
             Reader catalog_reader;
             catalog_reader.Parse(is, handler);
         }

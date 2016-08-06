@@ -5,7 +5,7 @@
 
 
 
-#include <History.h>
+#include <history/History.h>
 
 
 namespace fs = boost::filesystem;
