@@ -4,18 +4,17 @@
 //
 
 #include "PackageInfo.h"
-#include <action/Action.h>
 #include <algorithm>
 #include <action/DirectoryAction.h>
 
 using namespace rapidjson;
 
 void pkg::PackageInfo::addAction(const std::string &action_string) {
-    if(boost::contains(action_string, "set")){
+    if(boost::algorithm::starts_with(action_string, "set")){
         attrs.push_back(AttributeAction(action_string));
-    } else if(boost::contains(action_string, "depend")){
+    } else if(boost::algorithm::starts_with(action_string, "depend")){
         dependencies.push_back(DependAction(action_string));
-    } else if(boost::contains(action_string, "dir")){
+    } else if(boost::algorithm::starts_with(action_string, "dir")){
         dirs.push_back(DirectoryAction(action_string));
     }
 }
@@ -30,27 +29,27 @@ pkg::PackageInfo pkg::PackageInfo::operator+=(pkg::PackageInfo &alternate) {
     }
 
     if(!alternate.categories.empty()){
-        this->categories.insert(std::end(this->categories), std::begin(alternate.categories), std::end(alternate.categories));
+        this->categories.insert(this->categories.end(), std::make_move_iterator(alternate.categories.begin()), std::make_move_iterator(alternate.categories.end()));
     }
 
     if(!alternate.attrs.empty()){
-        this->attrs.insert(std::end(this->attrs), std::begin(alternate.attrs), std::end(alternate.attrs));
+        this->attrs.insert(this->attrs.end(), std::make_move_iterator(alternate.attrs.begin()), std::make_move_iterator(alternate.attrs.end()));
     }
 
     if(!alternate.links.empty()){
-        this->links.insert(std::end(this->links), std::begin(alternate.links), std::end(alternate.links));
+        this->links.insert(this->links.end(), std::make_move_iterator(alternate.links.begin()), std::make_move_iterator(alternate.links.end()));
     }
 
     if(!alternate.files.empty()){
-        this->files.insert(std::end(this->files), std::begin(alternate.files), std::end(alternate.files));
+        this->files.insert(this->files.end(), std::make_move_iterator(alternate.files.begin()), std::make_move_iterator(alternate.files.end()));
     }
 
     if(!alternate.dirs.empty()){
-        this->dirs.insert(std::end(this->dirs), std::begin(alternate.dirs), std::end(alternate.dirs));
+        this->dirs.insert(this->dirs.end(), std::make_move_iterator(alternate.dirs.begin()), std::make_move_iterator(alternate.dirs.end()));
     }
 
     if(!alternate.dependencies.empty()){
-        this->dependencies.insert(std::end(this->dependencies), std::begin(alternate.dependencies), std::end(alternate.dependencies));
+        this->dependencies.insert(this->dependencies.end(), std::make_move_iterator(alternate.dependencies.begin()), std::make_move_iterator(alternate.dependencies.end()));
     }
 
     if(!alternate.signature.empty()){

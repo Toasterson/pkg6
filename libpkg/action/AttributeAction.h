@@ -6,21 +6,27 @@
 #ifndef PKG6_ATTRIBUTEACTION_H
 #define PKG6_ATTRIBUTEACTION_H
 
-#include "Action.h"
+
+#include <rapidjson.h>
+#include <string>
+#include <vector>
+#include <document.h>
+
+using namespace rapidjson;
 
 namespace pkg{
     namespace action {
-        class AttributeAction : public Action {
+        class AttributeAction{
         public:
             AttributeAction(): action_type("set"){}
             AttributeAction(const std::string &action_string): action_type("set") {
                 parseActionString(action_string);
             }
 
-            const std::string action_type;
+            std::string action_type;
             std::string name;
             std::vector<std::string> values;
-            void parseActionString(const std::string &action_string);
+            void parseActionString(std::string action_string);
 
             std::string toActionString();
 

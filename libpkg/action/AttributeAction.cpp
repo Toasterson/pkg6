@@ -3,13 +3,20 @@
 // for License see LICENSE file in root of repository
 //
 
-#include "AttributeAction.h"
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
-#include <boost/algorithm/string/erase.hpp>
+#include "AttributeAction.h"
 #include "Exception.h"
 
-void pkg::action::AttributeAction::parseActionString(const std::string &action_string) {
-    boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\""));
+void pkg::action::AttributeAction::parseActionString(std::string action_string) {
+    std::string p = "\\\"";
+    std::string::size_type n = p.length();
+    for (std::string::size_type i = action_string.find(p);
+         i != std::string::npos;
+         i = action_string.find(p))
+        action_string.erase(i, n);
+    boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\"\'"));
     for(std::string token: tokens){
         if(token != action_type){
             boost::algorithm::erase_all(token, "\"");

@@ -6,18 +6,23 @@
 #ifndef PKG6_DIRECTORYACTION_H
 #define PKG6_DIRECTORYACTION_H
 
-#include "Action.h"
+#include <string>
+#include <map>
+#include <boost/algorithm/string.hpp>
+#include <document.h>
+
+using namespace rapidjson;
 
 namespace pkg{
     namespace action{
-        class DirectoryAction : Action {
+        class DirectoryAction{
         public:
             DirectoryAction(): action_type("dir"){}
             DirectoryAction(const std::string &action_string): action_type("dir") {
                 parseActionString(action_string);
             }
 
-            const std::string action_type;
+            std::string action_type;
             std::string path;
             std::string mode;
             std::string owner;
@@ -25,7 +30,7 @@ namespace pkg{
 
             std::map<std::string,std::string> facets;
 
-            void parseActionString(const std::string &action_string);
+            void parseActionString(std::string action_string);
 
             std::string toActionString();
 
@@ -51,7 +56,7 @@ namespace pkg{
                 if(rootValue.IsObject()){
                     for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr == rootValue.MemberEnd(); ++itr){
                         if(boost::contains(itr->name.GetString(), "facet.")){
-                            facets.insert(itr->name.GetString(), itr->value.GetString());
+                            facets.insert(std::pair<std::string,std::string>(itr->name.GetString(), itr->value.GetString()));
                         } else if(itr->name.GetString() == "path"){
                             path = itr->value.GetString();
                         } else if(itr->name.GetString() == "mode"){

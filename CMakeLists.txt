@@ -14,7 +14,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/catalog/Catalog.cpp libpkg/catalog/Catalog.h
         libpkg/image/ImageConfig.cpp libpkg/image/ImageConfig.cpp
         libpkg/Progress.h
-        libpkg/manifest/Manifest.cpp libpkg/manifest/Manifest.h libpkg/action/Action.h
+        libpkg/manifest/Manifest.cpp libpkg/manifest/Manifest.h
         libpkg/catalog/parser/V1BaseHandler.h libpkg/catalog/parser/V1DependencySummaryHandler.h
         libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/Exception.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
