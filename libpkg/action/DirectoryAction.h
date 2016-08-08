@@ -10,12 +10,13 @@
 #include <map>
 #include <boost/algorithm/string.hpp>
 #include <document.h>
+#include "Action.h"
 
 using namespace rapidjson;
 
 namespace pkg{
     namespace action{
-        class DirectoryAction{
+        class DirectoryAction : Action{
         public:
             DirectoryAction(): action_type("dir"){}
             DirectoryAction(const std::string &action_string): action_type("dir") {
@@ -33,6 +34,10 @@ namespace pkg{
             void parseActionString(std::string action_string);
 
             std::string toActionString();
+
+            void install(){}
+
+            bool validate(){ return true; }
 
             template <typename Writer>
             void Serialize(Writer& writer) const{

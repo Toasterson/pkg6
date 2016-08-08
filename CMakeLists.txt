@@ -16,7 +16,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/Progress.h
         libpkg/manifest/Manifest.cpp libpkg/manifest/Manifest.h
         libpkg/catalog/parser/V1BaseHandler.h libpkg/catalog/parser/V1DependencySummaryHandler.h
-        libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/Exception.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h)
+        libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/Exception.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h libpkg/action/Action.cpp libpkg/action/Action.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED tinyxml2/tinyxml2.h tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)

@@ -11,12 +11,13 @@
 #include <string>
 #include <vector>
 #include <document.h>
+#include "Action.h"
 
 using namespace rapidjson;
 
 namespace pkg{
     namespace action {
-        class AttributeAction{
+        class AttributeAction : Action{
         public:
             AttributeAction(): action_type("set"){}
             AttributeAction(const std::string &action_string): action_type("set") {
@@ -29,6 +30,10 @@ namespace pkg{
             void parseActionString(std::string action_string);
 
             std::string toActionString();
+
+            void install(){}
+
+            bool validate(){ return true; }
 
             template <typename Writer>
             void Serialize(Writer& writer) const{

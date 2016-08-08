@@ -4,20 +4,15 @@
 //
 
 #include <boost/tokenizer.hpp>
+#include <vector>
 #include "DirectoryAction.h"
 #include "Exception.h"
 
 void pkg::action::DirectoryAction::parseActionString(std::string action_string) {
-    std::string p = "\\\"";
-    std::string::size_type n = p.length();
-    for (std::string::size_type i = action_string.find(p);
-         i != std::string::npos;
-         i = action_string.find(p))
-        action_string.erase(i, n);
+    Action::clearActionString(action_string);
     boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\"\'"));
     for(std::string token: tokens){
         if(token != action_type){
-            boost::algorithm::erase_all(token, "\"");
             if(boost::contains(token, "path=")) {
                 boost::algorithm::erase_first_copy(token, "path=");
                 path = token;
