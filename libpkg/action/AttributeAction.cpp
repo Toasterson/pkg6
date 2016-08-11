@@ -10,15 +10,13 @@
 #include "Exception.h"
 
 void pkg::action::AttributeAction::parseActionString(std::string action_string) {
-    Action::clearActionString(action_string);
-    boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\"\'"));
-    for(std::string token: tokens){
+    for(std::string token: Action::tokenize(action_string)){
         if(token != action_type){
             if(boost::contains(token, "name=")) {
-                boost::algorithm::erase_first_copy(token, "name=");
+                token.erase(0, token.find("=")+1);
                 name = token;
             } else if (boost::contains(token, "value=")){
-                boost::algorithm::erase_first_copy(token, "value=");
+                token.erase(0, token.find("=")+1);
                 values.push_back(token);
             } else if (boost::contains(token, "=")){
                 std::vector<std::string> tmp;
@@ -30,6 +28,7 @@ void pkg::action::AttributeAction::parseActionString(std::string action_string) 
             }
         }
     }
+
 }
 
 std::string pkg::action::AttributeAction::toActionString() {

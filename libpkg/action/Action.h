@@ -13,7 +13,7 @@ namespace pkg{
     public :
         std::string action_type;
 
-        void clearActionString(std::string& action_string);
+        std::vector<std::string> tokenize(std::string action_string);
 
         virtual void parseActionString(std::string action_string)= 0;
 

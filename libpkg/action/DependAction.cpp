@@ -10,7 +10,7 @@
 #include "Exception.h"
 
 void pkg::action::DependAction::parseActionString(std::string action_string) {
-    Action::clearActionString(action_string);
+    Action::tokenize(action_string);
     boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\"\'"));
     for(std::string token: tokens){
         if(token != action_type){
