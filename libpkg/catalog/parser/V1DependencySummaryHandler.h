@@ -5,8 +5,7 @@
 
 #ifndef PKG6_CATALOGDEPENDENCYHANDLER_H
 #define PKG6_CATALOGDEPENDENCYHANDLER_H
-#include "reader.h"
-#include "error/en.h"
+#include "rapidjson/reader.h"
 #include <iostream>
 #include <string>
 #include <map>

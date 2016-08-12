@@ -7,10 +7,10 @@
 #define PKG6_ATTRIBUTEACTION_H
 
 
-#include <rapidjson.h>
+#include <rapidjson/rapidjson.h>
 #include <string>
 #include <vector>
-#include <document.h>
+#include <rapidjson/document.h>
 #include "Action.h"
 
 using namespace rapidjson;

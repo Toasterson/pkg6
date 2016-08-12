@@ -13,7 +13,8 @@
 #include "PackageCategory.h"
 #include "image/LicenseInfo.h"
 #include <boost/tokenizer.hpp>
-#include <document.h>
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/document.h>
 #include <action/AttributeAction.h>
 #include <action/DependAction.h>
 #include <action/DirectoryAction.h>

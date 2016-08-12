@@ -13,7 +13,7 @@
 #include <functional>
 #include <cctype>
 #include <locale>
-#include <tinyxml2.h>
+#include <tinyxml2/tinyxml2.h>
 #include <pkgdefs.h>
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include "boost/filesystem.hpp"

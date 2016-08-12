@@ -4,12 +4,12 @@
 //
 
 #include "Catalog.h"
-#include <filereadstream.h>
+#include <rapidjson/filereadstream.h>
 #include <catalog/parser/V1BaseHandler.h>
 #include <catalog/parser/V1DependencySummaryHandler.h>
-#include <istreamwrapper.h>
-#include <writer.h>
-#include <ostreamwrapper.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/ostreamwrapper.h>
 
 namespace fs = boost::filesystem;
 using namespace boost::property_tree;

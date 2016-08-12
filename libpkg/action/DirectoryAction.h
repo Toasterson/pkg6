@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include <boost/algorithm/string.hpp>
-#include <document.h>
+#include <rapidjson/document.h>
 #include "Action.h"
 
 using namespace rapidjson;

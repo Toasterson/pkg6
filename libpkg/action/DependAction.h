@@ -6,7 +6,7 @@
 #ifndef PKG6_DEPENDACTION_H
 #define PKG6_DEPENDACTION_H
 
-#include <document.h>
+#include <rapidjson/document.h>
 #include <map>
 #include <string>
 #include "Action.h"
