@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 project(pkg6)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories(lib libpkg)
+include_directories(lib libpkg lib/googletest/include)
 set(LIBPKG_SOURCE_FILES
         libpkg/image/Image.cpp libpkg/image/Image.h
         libpkg/image/LicenseInfo.cpp libpkg/image/LicenseInfo.h
@@ -22,3 +22,10 @@ add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)
 target_link_libraries(pkg6 debug tinyxml2 boost_filesystem boost_system)
 target_link_libraries(pkg debug pkg6)
+
+enable_testing()
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(pkg_tests libpkg/action_tests/AttributeActionTest.cpp)
+target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
+add_test(AllTestInPKG6 pkg_tests)
