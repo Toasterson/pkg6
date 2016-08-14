@@ -21,7 +21,7 @@ std::vector<std::string> pkg::Action::tokenize(std::string action_string) {
         strstr << action_string.substr(0, firstequalspos+1);
         //Then move that out of action_string
         action_string.erase(0, firstequalspos+1);
-        if(boost::contains(action_string, "=")){
+        if(boost::contains(action_string, "=") and boost::contains(action_string, " ")){
             //If we have still a = in the string then find the = of the next pair.
             //and copy everything up until the space char just before into strstr
             size_t secondequalpos = action_string.find("=");

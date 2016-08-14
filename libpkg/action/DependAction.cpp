@@ -3,25 +3,22 @@
 // for License see LICENSE file in root of repository
 //
 
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 #include "DependAction.h"
 #include "Exception.h"
 
 void pkg::action::DependAction::parseActionString(std::string action_string) {
-    Action::tokenize(action_string);
-    boost::tokenizer<boost::escaped_list_separator<char>> tokens(action_string, boost::escaped_list_separator<char>("\\", " ", "\"\'"));
-    for(std::string token: tokens){
+    for(std::string token: Action::tokenize(action_string)){
         if(token != action_type){
             if(boost::contains(token, "fmri=")) {
-                boost::algorithm::erase_first_copy(token, "fmri=");
+                token.erase(0, token.find("=")+1);
                 fmri = token;
             } else if (boost::contains(token, "type=")){
-                boost::algorithm::erase_first_copy(token, "type=");
+                token.erase(0, token.find("=")+1);
                 type = token;
             } else if (boost::contains(token, "predicate=")){
-                boost::algorithm::erase_first_copy(token, "predicate=");
+                token.erase(0, token.find("=")+1);
                 predicate = token;
             } else if (boost::contains(token, "=")){
                 std::vector<std::string> tmp;

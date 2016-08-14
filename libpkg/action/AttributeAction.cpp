@@ -21,14 +21,14 @@ void pkg::action::AttributeAction::parseActionString(std::string action_string) 
             } else if (boost::contains(token, "=")){
                 std::vector<std::string> tmp;
                 boost::split(tmp, token, boost::is_any_of("="));
-                name = tmp.front();
-                values.push_back(tmp.back());
-            } else {
-                throw exception::InvalidActionException("No name or value token");
+                optionals.insert(std::pair<std::string,std::string>(tmp.front(), tmp.back()));
+                continue;
             }
         }
     }
-
+    if(name.empty() or values.empty()){
+        throw exception::InvalidActionException("No name or value token");
+    }
 }
 
 std::string pkg::action::AttributeAction::toActionString() {

@@ -13,6 +13,12 @@ using namespace pkg::action;
 
 namespace {
 
+    TEST(AttributeAction, Ninth_String){
+        const AttributeAction action("set name=info.source-url value=http://www.pgpool.net/download.php?f=pgpool-II-3.3.1.tar.gz");
+        EXPECT_STREQ(action.name.c_str(), "info.source-url");
+        EXPECT_STREQ(action.values[0].c_str(), "http://www.pgpool.net/download.php?f=pgpool-II-3.3.1.tar.gz");
+    }
+
     TEST(AttributeAction, First_String){
         const AttributeAction action("set name=variant.opensolaris.zone value=global value=nonglobal");
         EXPECT_STREQ(action.name.c_str(), "variant.opensolaris.zone");

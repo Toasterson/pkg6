@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <rapidjson/document.h>
+#include <map>
 #include "Action.h"
 
 using namespace rapidjson;
@@ -27,6 +28,7 @@ namespace pkg{
             std::string action_type;
             std::string name;
             std::vector<std::string> values;
+            std::map<std::string,std::string> optionals;
             void parseActionString(std::string action_string);
 
             std::string toActionString();
@@ -43,6 +45,15 @@ namespace pkg{
                 for(auto value : values) {
                     writer.String(value.c_str());
                 }
+                if(!optionals.empty()){
+                    writer.String("opt");
+                    writer.StartObject();
+                    for(auto pair: optionals){
+                        writer.String(pair.first.c_str());
+                        writer.String(pair.second.c_str());
+                    }
+                    writer.EndObject();
+                }
                 writer.EndArray();
                 writer.EndObject();
             }
@@ -50,10 +61,16 @@ namespace pkg{
             void Deserialize(const Value& rootValue){
                 if(rootValue.IsObject()){
                     for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr == rootValue.MemberEnd(); ++itr){
-                        name = itr->name.GetString();
-                        if(itr->value.IsArray()) {
-                            for (rapidjson::SizeType i = 0; i < itr->value.Size(); i++) {
-                                values.push_back(itr->value[i].GetString());
+                        if(itr->name.GetString() == "opt"){
+                            for(Value::ConstMemberIterator itr2 = itr->value.MemberBegin(); itr2 == itr->value.MemberEnd(); ++itr2){
+                                optionals.insert(std::pair<std::string,std::string>(itr2->name.GetString(), itr2->value.GetString()));
+                            }
+                        } else {
+                            name = itr->name.GetString();
+                            if (itr->value.IsArray()) {
+                                for (rapidjson::SizeType i = 0; i < itr->value.Size(); i++) {
+                                    values.push_back(itr->value[i].GetString());
+                                }
                             }
                         }
                     }
