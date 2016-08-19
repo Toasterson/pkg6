@@ -2,12 +2,9 @@
 // Copyright (c) Till Wegmueller 2016 under CDDL
 // for License see LICENSE file in root of repository
 //
-
-#ifndef PKG6_ATTRIBUTEACTIONTEST_H
-#define PKG6_ATTRIBUTEACTIONTEST_H
-
 #include <action/AttributeAction.h>
 #include <gtest/gtest.h>
+#include <rapidjson/document.h>
 
 using namespace pkg::action;
 
@@ -67,5 +64,13 @@ namespace {
         EXPECT_STREQ(action.name.c_str(), "illumos-gate.info.git-remote");
         EXPECT_STREQ(action.values[0].c_str(), "git://github.com/illumos/illumos-gate.git");
     }
+
+    TEST(AttributeAction, Deserialize){
+        Document doc;
+        doc.Parse("{\"userland.info.git-remote\":[\"git://github.com/OpenIndiana/oi-userland.git\"]}");
+        AttributeAction act;
+        act.Deserialize(doc);
+        EXPECT_STREQ("userland.info.git-remote", act.name.c_str());
+        EXPECT_STREQ("git://github.com/OpenIndiana/oi-userland.git", act.values[0].c_str());
+    }
 }
-#endif //PKG6_ATTRIBUTEACTIONTEST_H

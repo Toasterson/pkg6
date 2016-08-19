@@ -6,7 +6,7 @@
 #include <boost/tokenizer.hpp>
 #include <vector>
 #include "DirectoryAction.h"
-#include "Exception.h"
+#include "ActionException.h"
 
 void pkg::action::DirectoryAction::parseActionString(std::string action_string) {
     Action::tokenize(action_string);

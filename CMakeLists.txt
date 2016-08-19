@@ -16,7 +16,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/Progress.h
         libpkg/manifest/Manifest.cpp libpkg/manifest/Manifest.h
         libpkg/catalog/parser/V1BaseHandler.h libpkg/catalog/parser/V1DependencySummaryHandler.h
-        libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/Exception.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h libpkg/action/Action.cpp libpkg/action/Action.h)
+        libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/ActionException.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h libpkg/action/Action.cpp libpkg/action/Action.h libpkg/vectoradd.h libpkg/package/PackageException.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg main.cpp)
@@ -26,6 +26,6 @@ target_link_libraries(pkg debug pkg6)
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(pkg_tests libpkg/action_tests/AttributeActionTest.cpp)
+add_executable(pkg_tests libpkg/action_tests/AttributeActionTest.cpp libpkg/package_tests/PackageInfoTest.cpp)
 target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
 add_test(AllTestInPKG6 pkg_tests)

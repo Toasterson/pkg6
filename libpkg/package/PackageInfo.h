@@ -48,10 +48,16 @@ namespace pkg {
         std::string build_release;
         std::string branch;
         std::tm packaging_date;
-        //TODO check what type these could be
-        std::string size;
-        std::string csize;
-        ////
+        std::string summary;
+        std::string description;
+        bool obsolete;
+        bool renamed;
+        std::vector<std::string> classification;
+        std::string humanversion;
+
+        int size;
+        int csize;
+
         std::string name;
         std::vector<LicenseInfo> licenses;
         std::tm last_update;
@@ -67,15 +73,7 @@ namespace pkg {
         PackageInfo(const std::string& publisher, const std::string& name, const std::string& version): publisher(publisher), name(name), version(version){}
         PackageInfo(const PackageInfo& origin): publisher(origin.publisher), name(origin.name), version(origin.version){}
         PackageInfo(const std::string& FMRI){
-
-        }
-
-        std::string getDescription(){
-            return "";
-        }
-
-        std::string getSummary(){
-            return "";
+            setFmri(FMRI);
         }
 
         std::string getFmri(){
@@ -86,7 +84,13 @@ namespace pkg {
             return getFmri() + ".json";
         }
 
+        void setFmri(const std::string& fmri);
+
         void addAction(const std::string& action_string);
+
+        void markObsolete();
+
+        void markRenamed();
 
         PackageInfo operator+=(PackageInfo& alternate);
 
@@ -99,26 +103,51 @@ namespace pkg {
             writer.String(name.c_str());
             writer.String("version");
             writer.String(version.c_str());
-            writer.String("signature");
-            writer.String(signature.c_str());
+            if(!signature.empty()) {
+                writer.String("signature");
+                writer.String(signature.c_str());
+            }
+            writer.String("summary");
+            writer.String(summary.c_str());
+            if(!description.empty()) {
+                writer.String("description");
+                writer.String(description.c_str());
+            }
+            if(!humanversion.empty()){
+                writer.String("humanversion");
+                writer.String(humanversion.c_str());
+            }
+            writer.String("classifications");
+            writer.StartArray();
+            for(auto classi : classification){
+                writer.String(classi);
+            }
+            writer.EndArray();
             writer.String("states");
             writer.StartArray();
             for(int state : states){
                 writer.Int(state);
             }
             writer.EndArray();
-            writer.String("attrs");
-            writer.StartArray();
-            for(auto attr : attrs){
-                attr.Serialize(writer);
+
+            if(!attrs.empty()) {
+                writer.String("attrs");
+                writer.StartArray();
+                for (auto attr : attrs) {
+                    attr.Serialize(writer);
+                }
+                writer.EndArray();
             }
-            writer.EndArray();
-            writer.String("dependencies");
-            writer.StartArray();
-            for(auto dep : dependencies){
-                dep.Serialize(writer);
+
+            if(!dependencies.empty()) {
+                writer.String("dependencies");
+                writer.StartArray();
+                for (auto dep : dependencies) {
+                    dep.Serialize(writer);
+                }
+                writer.EndArray();
             }
-            writer.EndArray();
+
             writer.EndObject();
         }
 
@@ -127,10 +156,23 @@ namespace pkg {
                 this->publisher = rootValue["publisher"].GetString();
                 this->name = rootValue["name"].GetString();
                 this->version = rootValue["version"].GetString();
-                this->signature = rootValue["signature"].GetString();
+                if(!signature.empty()) {
+                    this->signature = rootValue["signature"].GetString();
+                }
+                this->summary = rootValue["summary"].GetString();
+                if(rootValue.HasMember("description")) {
+                    this->description = rootValue["description"].GetString();
+                }
+                if(rootValue.HasMember("humanversion")) {
+                    this->humanversion = rootValue["humanversion"].GetString();
+                }
                 const Value& states = rootValue["states"];
-                for (Value::ConstValueIterator itr = states.Begin(); itr != states.End(); ++itr){
+                for (auto itr = states.Begin(); itr != states.End(); ++itr){
                     this->states.push_back(itr->GetInt());
+                }
+                const Value& classes = rootValue["classifications"];
+                for (auto itr = classes.Begin(); itr != classes.End(); ++itr){
+                    this->classification.push_back(itr->GetString());
                 }
                 if (rootValue.HasMember("attrs"))
                 {

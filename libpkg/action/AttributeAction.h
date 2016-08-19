@@ -39,30 +39,32 @@ namespace pkg{
 
             template <typename Writer>
             void Serialize(Writer& writer) const{
-                writer.StartObject();
-                writer.String(name.c_str());
-                writer.StartArray();
-                for(auto value : values) {
-                    writer.String(value.c_str());
-                }
-                if(!optionals.empty()){
-                    writer.String("opt");
+                if(!name.empty()) {
                     writer.StartObject();
-                    for(auto pair: optionals){
-                        writer.String(pair.first.c_str());
-                        writer.String(pair.second.c_str());
+                    writer.String(name.c_str());
+                    writer.StartArray();
+                    for (auto value : values) {
+                        writer.String(value.c_str());
                     }
+                    if (!optionals.empty()) {
+                        writer.String("opt");
+                        writer.StartObject();
+                        for (auto pair: optionals) {
+                            writer.String(pair.first.c_str());
+                            writer.String(pair.second.c_str());
+                        }
+                        writer.EndObject();
+                    }
+                    writer.EndArray();
                     writer.EndObject();
                 }
-                writer.EndArray();
-                writer.EndObject();
             }
 
             void Deserialize(const Value& rootValue){
                 if(rootValue.IsObject()){
-                    for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr == rootValue.MemberEnd(); ++itr){
+                    for(auto itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
                         if(itr->name.GetString() == "opt"){
-                            for(Value::ConstMemberIterator itr2 = itr->value.MemberBegin(); itr2 == itr->value.MemberEnd(); ++itr2){
+                            for(auto itr2 = itr->value.MemberBegin(); itr2 != itr->value.MemberEnd(); ++itr2){
                                 optionals.insert(std::pair<std::string,std::string>(itr2->name.GetString(), itr2->value.GetString()));
                             }
                         } else {

@@ -57,7 +57,7 @@ namespace pkg{
 
             void Deserialize(const Value& rootValue){
                 if(rootValue.IsObject()){
-                    for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr == rootValue.MemberEnd(); ++itr){
+                    for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
                         if(itr->name.GetString() == "fmri"){
                             fmri = itr->value.GetString();
                         } else if(itr->name.GetString() == "type"){

@@ -6,7 +6,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include "DependAction.h"
-#include "Exception.h"
+#include "ActionException.h"
 
 void pkg::action::DependAction::parseActionString(std::string action_string) {
     for(std::string token: Action::tokenize(action_string)){

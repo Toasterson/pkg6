@@ -4,59 +4,109 @@
 //
 
 #include "PackageInfo.h"
+#include "PackageException.h"
 #include <algorithm>
 #include <action/DirectoryAction.h>
+#include <vectoradd.h>
+#include <action/ActionException.h>
 
 using namespace rapidjson;
 
 void pkg::PackageInfo::addAction(const std::string &action_string) {
-    if(boost::algorithm::starts_with(action_string, "set")){
-        attrs.push_back(AttributeAction(action_string));
-    } else if(boost::algorithm::starts_with(action_string, "depend")){
-        dependencies.push_back(DependAction(action_string));
-    } else if(boost::algorithm::starts_with(action_string, "dir")){
-        dirs.push_back(DirectoryAction(action_string));
+    try {
+        if (boost::algorithm::starts_with(action_string, "set")) {
+            AttributeAction act = AttributeAction(action_string);
+            if (act.name == "pkg.fmri") {
+                this->setFmri(act.values[0]);
+            } else if (act.name == "info.classification") {
+                this->classification = act.values;
+            } else if (act.name == "pkg.summary") {
+                this->summary = act.values[0];
+            } else if (act.name == "pkg.description") {
+                this->description = act.values[0];
+            } else if (act.name == "pkg.obsolete") {
+                if(act.values[0] == "true"){
+                    markObsolete();
+                }
+            } else if (act.name == "pkg.renamed") {
+                if(act.values[0] == "true"){
+                    markRenamed();
+                }
+            } else if (act.name == "pkg.human-version") {
+                this->humanversion = act.values[0];
+            } else {
+                attrs.push_back(act);
+            }
+        } else if (boost::algorithm::starts_with(action_string, "depend")) {
+            dependencies.push_back(DependAction(action_string));
+        } else if (boost::algorithm::starts_with(action_string, "dir")) {
+            dirs.push_back(DirectoryAction(action_string));
+        } else if (boost::algorithm::starts_with(action_string, "file")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "link")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "hardlink")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "driver")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "license")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "legacy")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "signature")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "user")) {
+
+        } else if (boost::algorithm::starts_with(action_string, "group")) {
+
+        } else {
+            throw pkg::exception::InvalidPackageException(this->name,
+                                                          "action_string " + action_string + " not recognized");
+        }
+    } catch (pkg::action::exception::InvalidActionException actex) {
+            throw pkg::exception::InvalidPackageException(this->name, "Error while parsing action: " + std::string(actex.what()));
     }
 }
 
 pkg::PackageInfo pkg::PackageInfo::operator+=(pkg::PackageInfo &alternate) {
-    if(!alternate.states.empty()){
-        for(int state : alternate.states){
-            if(std::find(states.begin(), states.end(), state) == states.end()) {
-                states.push_back(state);
-            }
-        }
-    }
+    this->states += alternate.states;
+    this->categories += alternate.categories;
+    this->attrs += alternate.attrs;
+    this->classification += alternate.classification;
+    this->dirs += alternate.dirs;
+    this->dependencies += alternate.dependencies;
+    this->files += alternate.files;
+    this->licenses += alternate.licenses;
+    this->links += alternate.links;
 
-    if(!alternate.categories.empty()){
-        this->categories.insert(this->categories.end(), std::make_move_iterator(alternate.categories.begin()), std::make_move_iterator(alternate.categories.end()));
+    if(!alternate.description.empty()) {
+        this->description = alternate.description;
     }
-
-    if(!alternate.attrs.empty()){
-        this->attrs.insert(this->attrs.end(), std::make_move_iterator(alternate.attrs.begin()), std::make_move_iterator(alternate.attrs.end()));
+    if(!alternate.summary.empty()) {
+        this->summary = alternate.summary;
     }
-
-    if(!alternate.links.empty()){
-        this->links.insert(this->links.end(), std::make_move_iterator(alternate.links.begin()), std::make_move_iterator(alternate.links.end()));
+    if(!alternate.humanversion.empty()){
+        this->humanversion = alternate.humanversion;
     }
-
-    if(!alternate.files.empty()){
-        this->files.insert(this->files.end(), std::make_move_iterator(alternate.files.begin()), std::make_move_iterator(alternate.files.end()));
-    }
-
-    if(!alternate.dirs.empty()){
-        this->dirs.insert(this->dirs.end(), std::make_move_iterator(alternate.dirs.begin()), std::make_move_iterator(alternate.dirs.end()));
-    }
-
-    if(!alternate.dependencies.empty()){
-        this->dependencies.insert(this->dependencies.end(), std::make_move_iterator(alternate.dependencies.begin()), std::make_move_iterator(alternate.dependencies.end()));
-    }
-
-    if(!alternate.signature.empty()){
-        this->signature = alternate.signature;
-    }
+    this->renamed = alternate.renamed;
+    this->obsolete = alternate.obsolete;
 
     return *this;
+}
+
+void pkg::PackageInfo::setFmri(const std::string &fmri) {
+
+}
+
+void pkg::PackageInfo::markObsolete() {
+    this->obsolete = true;
+    this->summary.clear();
+    this->dependencies.clear();
+}
+
+void pkg::PackageInfo::markRenamed() {
+    this->renamed = true;
+    this->summary.clear();
 }
 
 
