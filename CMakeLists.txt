@@ -19,9 +19,9 @@ set(LIBPKG_SOURCE_FILES
         libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/ActionException.h libpkg/action/DependAction.cpp libpkg/action/DependAction.h libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h libpkg/action/Action.cpp libpkg/action/Action.h libpkg/vectoradd.h libpkg/package/PackageException.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
-add_executable(pkg main.cpp)
+add_executable(pkg pkg/main.cpp)
 target_link_libraries(pkg6 debug tinyxml2 boost_filesystem boost_system)
-target_link_libraries(pkg debug pkg6)
+target_link_libraries(pkg debug pkg6 boost_program_options)
 
 enable_testing()
 find_package(GTest REQUIRED)

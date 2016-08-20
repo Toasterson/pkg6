@@ -43,7 +43,6 @@ public:
         }
         if(current == count){
             writeStatus();
-            stream << "\n";
         }
         return current;
     }
