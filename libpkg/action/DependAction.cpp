@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <sstream>
 #include "DependAction.h"
 #include "ActionException.h"
 
@@ -38,5 +39,15 @@ void pkg::action::DependAction::parseActionString(std::string action_string) {
 }
 
 std::string pkg::action::DependAction::toActionString() {
-    return "";
+    std::ostringstream stringStream;
+    stringStream << action_type << " fmri=" << fmri << " type=" << type;
+    if(!predicate.empty()){
+        stringStream << " predicate=" << predicate;
+    }
+    if(!optional.empty()){
+        for(auto pair : optional){
+            stringStream << " " << pair.first << "=" << pair.second;
+        }
+    }
+    return stringStream.str();
 }

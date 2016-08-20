@@ -58,14 +58,16 @@ namespace pkg{
             void Deserialize(const Value& rootValue){
                 if(rootValue.IsObject()){
                     for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
-                        if(itr->name.GetString() == "fmri"){
-                            fmri = itr->value.GetString();
-                        } else if(itr->name.GetString() == "type"){
-                            type = itr->value.GetString();
-                        } else if(itr->name.GetString() == "predicate"){
-                            predicate = itr->value.GetString();
+                        std::string name = itr->name.GetString();
+                        std::string value = itr->value.GetString();
+                        if(name == "fmri"){
+                            fmri = value;
+                        } else if(name == "type"){
+                            type = value;
+                        } else if(name == "predicate"){
+                            predicate = value;
                         } else {
-                            optional.insert(std::pair<std::string,std::string>(itr->name.GetString(), itr->value.GetString()));
+                            optional.insert(std::pair<std::string,std::string>(name, value));
                         }
                     }
                 }

@@ -7,6 +7,7 @@
 #define PKG6_ACTION_H
 
 #include <string>
+#include <vector>
 
 namespace pkg{
     class Action {
