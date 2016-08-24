@@ -9,7 +9,7 @@
 namespace fs = boost::filesystem;
 
 std::string pkg::Image::getImgDir(){
-    return "";
+    return image_root+IMAGE_ROOT_PATH;
 }
 
 std::string pkg::Image::getImgRoot() {
@@ -30,11 +30,12 @@ std::string pkg::Image::getArch() {
 }
 
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
-    history(pkg::history::History(root)),
-    config(pkg::ImageConfig(root)),
-    installed(pkg::Catalog(root, "installed")),
-    known(pkg::Catalog(root, "known")),
-    allow_ondisk_upgrade(allow_ondisk_upgrade)
+    image_root(root),
+    allow_ondisk_upgrade(allow_ondisk_upgrade),
+    config(pkg::ImageConfig(getImgDir())),
+    history(pkg::history::History(getImgDir()+"/history")),
+    installed(pkg::Catalog(getImgDir(), CATALOG_INSTALLED)),
+    known(pkg::Catalog(getImgDir(), CATALOG_KNOWN))
 {
 
 }

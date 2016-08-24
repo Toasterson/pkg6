@@ -13,6 +13,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/filesystem/operations.hpp>
 
+
 namespace pkg {
     class ImageConfig {
     private:
