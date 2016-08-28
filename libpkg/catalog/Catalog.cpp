@@ -59,6 +59,7 @@ pkg::Catalog::Catalog(const std::string &root, const std::string &name, const bo
     // As the Catalog in pkg6 will always reside on disk a load is not required
     if(fs::is_regular_file(fs::system_complete((root_dir+"/catalog.attrs").c_str()))){
         this->read_only = true;
+        this->needs_upgrade = true;
     }
 }
 
@@ -120,10 +121,41 @@ void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
 }
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
-    //TODO Implement
+    std::vector<std::string> found;
+    for(auto entry = fs::recursive_directory_iterator(statePath(), fs::symlink_option::no_recurse); entry <= fs::recursive_directory_iterator(); entry++){
+        if(boost::starts_with(entry->path().filename(), fmri)){
+            found.push_back(entry->path().string());
+        }
+    }
+    if(found.size() > 1){
+        std::sort(found.begin(), found.end());
+    }
+    pkg::PackageInfo pkg("pkg://"+found[0]);
+    loadPackage(pkg);
     return pkg::PackageInfo();
+}
+
+std::vector<pkg::PackageInfo> pkg::Catalog::getPackages(const std::vector<std::string> &fmris) {
+    std::vector<pkg::PackageInfo> packages;
+    for(auto fmri: fmris) {
+        packages.push_back(getPackage(fmri));
+    }
+    return packages;
 }
 
 std::string pkg::Catalog::statePath() {
     return root_dir + "/state/" + name;
+}
+
+std::vector<pkg::PackageInfo> pkg::Catalog::dependResolve(const pkg::PackageInfo &pkg) {
+    return vector<pkg::PackageInfo>();
+}
+
+bool pkg::Catalog::contains(const pkg::PackageInfo &pkg) {
+    //Todo Implement
+    return false;
+}
+
+bool pkg::Catalog::needsUpgrade() {
+    return needs_upgrade;
 }

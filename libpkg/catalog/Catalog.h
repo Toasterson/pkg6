@@ -24,6 +24,7 @@ namespace pkg {
     private:
         bool read_only;
         bool do_sign;
+        bool needs_upgrade;
         std::string signature;
         std::string root_dir;
         std::string name;
@@ -71,9 +72,15 @@ namespace pkg {
 
         std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& fmris);
 
-        bool exists();
+        bool contains(const pkg::PackageInfo& pkg);
+
+        std::vector<pkg::PackageInfo> resolve(const std::vector<std::string>& pkgs);
+
+        std::vector<pkg::PackageInfo> dependResolve(const pkg::PackageInfo& pkg);
 
         std::string statePath();
+
+        bool needsUpgrade();
 
     };
 };

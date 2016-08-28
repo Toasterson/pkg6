@@ -10,6 +10,7 @@
 #include <history/History.h>
 #include <image/ImageConfig.h>
 #include <catalog/Catalog.h>
+#include "ImagePlan.h"
 
 namespace pkg {
     class Image {
@@ -52,6 +53,7 @@ namespace pkg {
         bool locked;
         std::string image_root;
         void importpkg5();
+        bool upgrade_needed;
 
 
         //TODO Check Type
@@ -111,6 +113,9 @@ namespace pkg {
         std::string getArch();
         std::tm getLastModified();
 
+        bool needsUpgrade();
+
+        pkg::ImagePlan makePlan(const std::vector<std::string> &packages);
 
     };
 };

@@ -21,6 +21,18 @@ namespace pkg {
                 return m_msg.c_str();
             }
         };
+
+        class InvalidFMRIException : public std::exception {
+        private:
+            std::string m_msg;
+        public:
+            InvalidFMRIException(const std::string& fmri)
+                    : m_msg(std::string("Invalid package FMRI ") + fmri)
+            {}
+            virtual const char *what() const throw() {
+                return m_msg.c_str();
+            }
+        };
     }
 }
 #endif //PKG6_PACKAGEXCEPTION_H

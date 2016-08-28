@@ -95,7 +95,16 @@ pkg::PackageInfo pkg::PackageInfo::operator+=(pkg::PackageInfo &alternate) {
 }
 
 void pkg::PackageInfo::setFmri(const std::string &fmri) {
-
+    //We must have full package fmri
+    if(!boost::starts_with(fmri, "pkg://")) {
+        throw pkg::exception::InvalidFMRIException(fmri);
+    }
+    std::string fmritmp = boost::erase_first_copy(fmri, "pkg://");
+    publisher = fmritmp.substr(0, fmritmp.find("/"));
+    fmritmp.erase(0, fmritmp.find("/"));
+    name = fmritmp.substr(0, fmritmp.find("@"));
+    fmritmp.erase(0, fmritmp.find("@"));
+    version = fmritmp;
 }
 
 void pkg::PackageInfo::markObsolete() {

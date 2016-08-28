@@ -37,7 +37,9 @@ pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     installed(pkg::Catalog(getImgDir(), CATALOG_INSTALLED)),
     known(pkg::Catalog(getImgDir(), CATALOG_KNOWN))
 {
-
+    if(known.needsUpgrade() or installed.needsUpgrade()){
+        this->upgrade_needed = true;
+    }
 }
 
 void pkg::Image::lock(const bool &allow_unprevileged) {
@@ -81,6 +83,17 @@ void pkg::Image::upgrade_format(std::string newRoot) {
 
 void pkg::Image::importpkg5() {
 
+}
+
+pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
+    known.resolve(packages);
+
+
+    return pkg::ImagePlan();
+}
+
+bool pkg::Image::needsUpgrade() {
+    return upgrade_needed;
 }
 
 
