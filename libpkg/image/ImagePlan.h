@@ -11,15 +11,26 @@
 
 namespace pkg {
     class ImagePlan {
-        //TODO more action classes to be included here
-        std::vector<std::string> packages;
+        //TODO more action classes to be saved here
+        std::vector<pkg::PackageInfo> packages;
     public:
+
+        ImagePlan(){}
+        ImagePlan(const std::vector<pkg::PackageInfo> &packages);
 
         void add(const pkg::PackageInfo &pkg);
 
-        void contains(const pkg::PackageInfo &pkg);
+        void add(const std::vector<pkg::PackageInfo> &pkgs);
+
+        bool contains(const pkg::PackageInfo &pkg);
+
+        bool contains(const std::string &fmri);
 
         void install();
+
+        bool empty(){
+            return packages.empty();
+        }
     };
 }
 

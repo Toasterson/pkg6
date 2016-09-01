@@ -9,17 +9,14 @@
 #include <string>
 #include <vector>
 #include <ctime>
-#include <boost/property_tree/ptree.hpp>
 #include "PackageCategory.h"
 #include "image/LicenseInfo.h"
-#include <boost/tokenizer.hpp>
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
 #include <action/AttributeAction.h>
 #include <action/DependAction.h>
 #include <action/DirectoryAction.h>
 
-using namespace boost::property_tree;
 using namespace rapidjson;
 using namespace  pkg::action;
 
@@ -76,7 +73,7 @@ namespace pkg {
             setFmri(FMRI);
         }
 
-        std::string getFmri(){
+        std::string getFmri() const {
             return publisher + "/" + name + "@" + version;
         }
 

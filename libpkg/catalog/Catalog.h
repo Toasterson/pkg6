@@ -74,9 +74,7 @@ namespace pkg {
 
         bool contains(const pkg::PackageInfo& pkg);
 
-        std::vector<pkg::PackageInfo> resolve(const std::vector<std::string>& pkgs);
-
-        std::vector<pkg::PackageInfo> dependResolve(const pkg::PackageInfo& pkg);
+        bool contains(std::string fmri);
 
         std::string statePath();
 

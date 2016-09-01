@@ -122,8 +122,8 @@ void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
     std::vector<std::string> found;
-    for(auto entry = fs::recursive_directory_iterator(statePath(), fs::symlink_option::no_recurse); entry <= fs::recursive_directory_iterator(); entry++){
-        if(boost::starts_with(entry->path().filename(), fmri)){
+    for(auto entry = fs::recursive_directory_iterator(statePath().c_str(), fs::symlink_option::no_recurse); entry != fs::recursive_directory_iterator(); entry++){
+        if(boost::starts_with(entry->path().filename().string(), fmri)){
             found.push_back(entry->path().string());
         }
     }
@@ -147,15 +147,31 @@ std::string pkg::Catalog::statePath() {
     return root_dir + "/state/" + name;
 }
 
-std::vector<pkg::PackageInfo> pkg::Catalog::dependResolve(const pkg::PackageInfo &pkg) {
-    return vector<pkg::PackageInfo>();
+bool pkg::Catalog::contains(const pkg::PackageInfo &pkg) {
+    return contains(pkg.getFmri());
 }
 
-bool pkg::Catalog::contains(const pkg::PackageInfo &pkg) {
-    //Todo Implement
+
+bool pkg::Catalog::contains(std::string fmri) {
+    if(boost::starts_with(fmri, "pkg://")){
+        boost::erase_first(fmri, "pkg://");
+    } else if(boost::starts_with(fmri, "pkg:/")){
+        boost::erase_first(fmri, "pkg:/");
+    }
+    //Lets first try if path exists e.g. publisher is already prepended
+    if(fs::exists((statePath() + "/" + fmri).c_str())){
+        return true;
+    }
+    //If the path does not exist prepend the any publisher to see if it does
+    for(fs::directory_iterator directoryIterator(fs::path(statePath().c_str())); directoryIterator != fs::directory_iterator(); directoryIterator++){
+        if(fs::exists(directoryIterator->path().string() + "/" + fmri)){
+            return true;
+        }
+    }
     return false;
 }
 
 bool pkg::Catalog::needsUpgrade() {
     return needs_upgrade;
 }
+

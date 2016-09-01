@@ -33,6 +33,18 @@ namespace pkg {
                 return m_msg.c_str();
             }
         };
+
+        class AlreadyInstalled : public std::exception {
+        private:
+            std::string m_msg;
+        public:
+            AlreadyInstalled(const std::string& fmri)
+                    : m_msg(std::string("Package is already installed ") + fmri)
+            {}
+            virtual const char *what() const throw() {
+                return m_msg.c_str();
+            }
+        };
     }
 }
 #endif //PKG6_PACKAGEXCEPTION_H

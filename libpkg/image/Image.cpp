@@ -4,7 +4,9 @@
 //
 
 #include <boost/filesystem.hpp>
+#include <package/PackageException.h>
 #include "Image.h"
+#include <vectoradd.h>
 
 namespace fs = boost::filesystem;
 
@@ -85,15 +87,30 @@ void pkg::Image::importpkg5() {
 
 }
 
-pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
-    known.resolve(packages);
-
-
-    return pkg::ImagePlan();
-}
-
 bool pkg::Image::needsUpgrade() {
     return upgrade_needed;
+}
+
+pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
+    std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
+    pkg::ImagePlan plan;
+    for(auto pkg : resolved){
+        if(!installed.contains(pkg) and !plan.contains(pkg)){
+            getNotInstalledDeps(pkg, plan);
+            plan.add(pkg);
+        }
+    }
+    return plan;
+}
+
+void pkg::Image::getNotInstalledDeps(const pkg::PackageInfo &pkg, pkg::ImagePlan &plan) {
+    for(auto dep : pkg.dependencies){
+        if(!installed.contains(dep.fmri) and !plan.contains(dep.fmri)){
+            pkg::PackageInfo pack(dep.fmri);
+            known.loadPackage(pack);
+            getNotInstalledDeps(pack, plan);
+        }
+    }
 }
 
 

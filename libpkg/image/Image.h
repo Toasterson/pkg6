@@ -63,6 +63,9 @@ namespace pkg {
         std::string image_prefix;
         std::string index_dir;
         std::string plandir;
+
+        void getNotInstalledDeps(const pkg::PackageInfo &pkg, pkg::ImagePlan &plan);
+
     public:
         const std::string CATALOG_KNOWN = "known";
         const std::string CATALOG_INSTALLED = "installed";
@@ -116,6 +119,22 @@ namespace pkg {
         bool needsUpgrade();
 
         pkg::ImagePlan makePlan(const std::vector<std::string> &packages);
+
+        std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string> & packages){
+            return known.getPackages(packages);
+        }
+
+        pkg::PackageInfo getPackage(const std::string fmri){
+            return known.getPackage(fmri);
+        }
+
+        bool isInstalled(const pkg::PackageInfo &pkg){
+            return installed.contains(pkg);
+        }
+
+        bool isInstalled(const std::string &fmri){
+            return installed.contains(known.getPackage(fmri));
+        }
 
     };
 };
