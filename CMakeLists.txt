@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 project(pkg6)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories(lib libpkg /usr/local/include)
+include_directories(lib libpkg lib/beast/include)
 link_directories(/usr/local/lib)
 set(LIBPKG_SOURCE_FILES
         libpkg/image/Image.cpp libpkg/image/Image.h
@@ -28,7 +28,7 @@ set(LIBPKG_SOURCE_FILES
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)
-target_link_libraries(pkg6 debug tinyxml2 boost_filesystem boost_system restbed)
+target_link_libraries(pkg6 debug tinyxml2 boost_filesystem boost_system)
 target_link_libraries(pkg debug pkg6 boost_program_options)
 
 enable_testing()

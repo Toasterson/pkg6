@@ -8,7 +8,8 @@
 
 #include <string>
 #include <map>
-#include <restbed>
+#include <image/Image.h>
+#include <beast/include/beast/http.hpp>
 
 
 class HttpClient {
@@ -16,11 +17,18 @@ private:
     std::map<std::string, int> SERVER_VERSION;
     const static int CLIENT_VERSION = 3;
 
-    std::string base_url;
+    const std::string USER_AGENT;
+
+    std::string protocol;
+    std::string host;
+    std::string base_path;
     std::string publisher;
 
-    void print(const std::shared_ptr< restbed::Response >& response );
+    std::string url_encode(const std::string& value);
 
+    beast::http::response_v1<beast::http::string_body> makeStringHTTPRequest(const std::string &url);
+
+    beast::http::response_v1<beast::http::streambuf_body > makeStreamHTTPRequest(const std::string &url);
 
     /*
      * Actual REST functions called by the Public functions
@@ -47,19 +55,19 @@ private:
 
     void getFileList_0();
 
-    void getManifest_0();
+    void getManifest_0(const std::string &manifest, std::ostream& savePath);
 
-    void getManifest_1();
+    void getManifest_1(const std::string &manifest, std::ostream&);
 
-    void getFile_0();
+    void getFile_0(const std::string& sha1, std::ostream& savePath);
 
-    void getFile_1();
+    void getFile_1(const std::string& sha1, std::ostream& savePath);
 
 
 
 public:
 
-    HttpClient(const std::string& base_url, const std::string& publisher);
+    HttpClient(const std::string& protocol, const std::string& host, const std::string& base_path, const std::string& publisher);
 
     void getInfo();
 
@@ -71,9 +79,14 @@ public:
 
     void getCatalog();
 
-    void getManifest();
+    void getManifest(const std::string& manifest, std::ostream& savePath);
 
-    void getFile();
+    //TODO Rewrite to use FileAction once that exists
+    void getFile(const std::string& sha1, std::ostream& savePath);
+
+    std::map<std::string,int> getVersion(){
+        return SERVER_VERSION;
+    }
 
 };
 

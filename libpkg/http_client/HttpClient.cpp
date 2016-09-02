@@ -5,68 +5,160 @@
 
 #include "HttpClient.h"
 #include "HTTPException.h"
-#include <restbed>
 #include <iostream>
+#include <boost/asio.hpp>
+#include <string>
+#include <beast/include/beast/http.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
-using namespace restbed;
+using namespace boost::asio;
+using namespace beast;
 
 void HttpClient::getVersion_0() {
-    auto request = make_shared< Request >( Uri( "http://www.golem.de" ) );
-    request->set_header( "Accept", "*/*" );
-    /*
-    request->set_header( "Cache-Control", "no-cache" );
-    request->set_header("Accept-Encoding", "gzip,deflate");
-    request->set_header("User-Agent", "PKG6/0.0.1");
-     */
-    request->set_header("Host", "www.golem.de");
-    //request->set_method("GET");
+    int status = 0;
+    try{
+        io_service ios;
+        ip::tcp::resolver r{ios};
+        ip::tcp::socket sock{ios};
+        connect(sock,
+                r.resolve(ip::tcp::resolver::query{host, protocol}));
 
-    auto response = Http::sync( request );
+        http::request_v1<beast::http::string_body> request;
+        request.method = "GET";
+        request.url = (base_path + "/versions/0");
+        request.version = 11;
+        request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
+        request.headers.replace("User-Agent", USER_AGENT);
+        http::prepare(request);
+        http::write(sock, request);
 
-    int code = response->get_status_code();
-/*
-    if(code != 200){
-        throw pkg::exception::HTTPBadResponseException(code);
+        // Receive and print HTTP response using beast
+        beast::streambuf sb;
+        http::response_v1<beast::http::string_body> resp;
+        http::read(sock, sb, resp);
+        status = resp.status;
+        string body = resp.body;
+        vector<string> v_body;
+        boost::split(v_body, body, boost::is_any_of("\n"));
+        for(auto line: v_body) {
+            vector<string> v_line;
+            boost::split(v_line, line, boost::is_any_of(" "));
+            if(v_line[0] != "pkg-server"){
+                string name = v_line[0];
+                v_line.erase(v_line.begin());
+                int value = 0;
+                for(auto val: v_line){
+                    value = stoi(val);
+                }
+                SERVER_VERSION.insert(pair<string,int>(name, value));
+            }
+        }
+    } catch (...){
+        cerr << "Error while parsing response froms server.";
+        throw pkg::exception::HTTPBadResponseException(status);
     }
-*/
-    print(response);
 
-    /*
-    auto future = Http::async( request, [ ]( const shared_ptr< Request >, const shared_ptr< Response > response )
-    {
-
-    } );
-
-    future.wait( );
-
-    */
 }
 
-HttpClient::HttpClient(const std::string &base_url, const std::string& publisher):
-        base_url(base_url),
-        publisher(publisher)
-{
+HttpClient::HttpClient(const std::string &protocol, const std::string &host, const std::string &base_path,
+                       const std::string &publisher) :
+                        protocol(protocol),
+                        host(host),
+                        base_path(base_path),
+                        publisher(publisher),
+                        USER_AGENT("PKG6/0.0.1"){
     getVersion_0();
 }
 
-void HttpClient::print(const std::shared_ptr<restbed::Response> &response) {
-    fprintf( stderr, "\n*** Response ***\n" );
-    fprintf( stderr, "Status Code:    %i\n", response->get_status_code( ) );
-    fprintf( stderr, "Status Message: %s\n", response->get_status_message( ).data( ) );
-    fprintf( stderr, "HTTP Version:   %.1f\n", response->get_version( ) );
-    fprintf( stderr, "HTTP Protocol:  %s\n", response->get_protocol( ).data( ) );
-
-    for ( const auto header : response->get_headers( ) )
-    {
-        fprintf( stderr, "Header '%s' > '%s'\n", header.first.data( ), header.second.data( ) );
-    }
-
-    auto length = 0;
-    response->get_header( "Content-Length", length );
-
-    Http::fetch( length, response );
-
-    fprintf( stderr, "Body:           %.*s...\n\n", 25, response->get_body( ).data( ) );
+void HttpClient::getManifest(const std::string &manifest, std::ostream& savePath) {
+    getManifest_0(manifest, savePath);
 }
 
+void HttpClient::getManifest_0(const std::string &manifest, std::ostream& savePath) {
+    savePath << makeStringHTTPRequest(base_path + "/" + publisher + "/manifest/0/" + url_encode(manifest)).body;
+}
+
+std::string HttpClient::url_encode(const std::string &value) {
+    ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
+        }
+
+        // Any other characters are percent-encoded
+        escaped << uppercase;
+        escaped << '%' << setw(2) << int((unsigned char) c);
+        escaped << nouppercase;
+    }
+
+    return escaped.str();
+}
+
+beast::http::response_v1<http::string_body> HttpClient::makeStringHTTPRequest(const std::string &url) {
+    io_service ios;
+    ip::tcp::resolver r{ios};
+    ip::tcp::socket sock{ios};
+    connect(sock, r.resolve(ip::tcp::resolver::query{host, protocol}));
+    http::request_v1<beast::http::empty_body> request;
+    request.method = "GET";
+    request.url = url;
+    request.version = 11;
+    request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
+    request.headers.replace("User-Agent", USER_AGENT);
+    http::prepare(request);
+    http::write(sock, request);
+
+    // Receive HTTP response using beast
+    beast::streambuf sb;
+    http::response_v1<beast::http::string_body> resp;
+    http::read(sock, sb, resp);
+    return resp;
+}
+
+beast::http::response_v1<beast::http::streambuf_body> HttpClient::makeStreamHTTPRequest(const std::string &url) {
+    io_service ios;
+    ip::tcp::resolver r{ios};
+    ip::tcp::socket sock{ios};
+    connect(sock, r.resolve(ip::tcp::resolver::query{host, protocol}));
+    http::request_v1<beast::http::empty_body> request;
+    request.method = "GET";
+    request.url = url;
+    request.version = 11;
+    request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
+    request.headers.replace("User-Agent", USER_AGENT);
+    http::prepare(request);
+    http::write(sock, request);
+
+    // Receive HTTP response using beast
+    beast::streambuf sb;
+    http::response_v1<beast::http::streambuf_body> resp;
+    http::read(sock, sb, resp);
+    return resp;
+}
+
+
+//TODO Check if these actions could be async and how
+void HttpClient::getFile(const std::string &sha1, std::ostream &savePath) {
+    if(SERVER_VERSION["file"] == 1){
+        getFile_1(sha1, savePath);
+    } else {
+        getFile_0(sha1, savePath);
+    }
+}
+
+void HttpClient::getFile_1(const std::string &sha1, std::ostream &savePath) {
+    savePath << makeStringHTTPRequest(base_path + "/" + publisher + "/file/1/" + sha1).body;
+}
+
+void HttpClient::getFile_0(const std::string &sha1, std::ostream &savePath) {
+    savePath << makeStringHTTPRequest(base_path + "/" + publisher + "/file/0/" + sha1).body;
+}
