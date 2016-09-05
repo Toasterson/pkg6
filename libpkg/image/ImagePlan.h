@@ -8,15 +8,18 @@
 
 
 #include <package/PackageInfo.h>
+#include "ImageConfig.h"
 
 namespace pkg {
     class ImagePlan {
         //TODO more action classes to be saved here
         std::vector<pkg::PackageInfo> packages;
+        pkg::ImageConfig config;
+        std::string CACHE_ROOT;
     public:
 
-        ImagePlan(){}
-        ImagePlan(const std::vector<pkg::PackageInfo> &packages);
+        ImagePlan(const pkg::ImageConfig& config, const std::string& cache):config(config),CACHE_ROOT(cache) {}
+        ImagePlan(const std::vector<pkg::PackageInfo> &packages, const pkg::ImageConfig& config, const std::string& cache);
 
         void add(const pkg::PackageInfo &pkg);
 
@@ -27,6 +30,8 @@ namespace pkg {
         bool contains(const std::string &fmri);
 
         void install();
+
+        void download();
 
         bool empty(){
             return packages.empty();

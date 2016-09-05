@@ -17,8 +17,6 @@
 #include <pkgdefs.h>
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include "boost/filesystem.hpp"
-#include "boost/progress.hpp"
-#include "boost/algorithm/string.hpp"
 #include <iomanip>
 
 namespace pkg {

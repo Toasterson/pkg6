@@ -6,6 +6,7 @@
 
 
 #include <history/History.h>
+#include <boost/algorithm/string.hpp>
 
 
 namespace fs = boost::filesystem;

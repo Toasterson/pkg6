@@ -9,9 +9,8 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <publisher/Publisher.h>
 
 
 namespace pkg {
@@ -19,27 +18,29 @@ namespace pkg {
     private:
         const std::string IMAGE_CONFIG_OLDFILENAME = "pkg5.image";
         const std::string IMAGE_CONFIG_FILENAME = "pkg6.image";
-        std::string root;
-        boost::property_tree::ptree pt;
-        void importpkg5();
+        int VERSION = 4;
+        string IMAGE_ROOT;
+        map<string, Publisher> publishers;
+        map<string, string> properties;
+        map<string, string> variants;
     public:
-        std::string getVariant(std::string name);
-        std::string getFacet(std::string name);
-        std::string getPublisher(std::string name);
-        std::string getMediator(std::string name);
-        std::string getImageProperty(std::string name);
+        int getVersion() { return VERSION; };
 
-        std::vector<std::string> getSectionVariant(std::vector<std::string>& filter);
-        std::vector<std::string> getSectionFacet(std::vector<std::string>& filter);
-        std::vector<std::string> getSectionPublisher(std::vector<std::string>& filter);
-        std::vector<std::string> getSectionMediator(std::vector<std::string>& filter);
-        std::vector<std::string> getSectionImage(std::vector<std::string>& filter);
+
+        std::string getVariant(const std::string& name);
+        pkg::Publisher getPublisher(const std::string& name);
+        pkg::Publisher getFirstPublisher();
+        std::string getImageProperty(const std::string& name);
+
+        void set(const std::string& path, const std::string& value);
 
         ImageConfig()= default;
-        ImageConfig(const std::string &root);
-        void load();
+        ImageConfig(const std::string& root);
+        void load(const std::istream& config);
         void save();
-        void upgrade_format(const std::string &newRoot = "");
+        void save(std::ostream& output);
+        void upgrade_format(const std::string &newRoot);
+        void importpkg5(std::istream& oldconfig);
     };
 };
 

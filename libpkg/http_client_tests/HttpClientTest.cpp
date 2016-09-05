@@ -35,7 +35,7 @@ namespace {
 
     TEST_F(HTTPTest, File1){
         std::stringstream ss;
-        client.getManifest("e85098cd7a821179b8620b48dc12d04099bff3a3", ss);
+        client.getFile("e85098cd7a821179b8620b48dc12d04099bff3a3", ss);
         ASSERT_GT(ss.str().size(), 1);
     }
 }

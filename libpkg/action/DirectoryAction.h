@@ -8,8 +8,8 @@
 
 #include <string>
 #include <map>
-#include <boost/algorithm/string.hpp>
 #include <rapidjson/document.h>
+#include <boost/algorithm/string.hpp>
 #include "Action.h"
 
 using namespace rapidjson;

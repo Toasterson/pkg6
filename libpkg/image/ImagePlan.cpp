@@ -4,17 +4,41 @@
 //
 
 #include "ImagePlan.h"
+#include <http_client/HttpClient.h>
+#include <boost/algorithm/string.hpp>
+
+void pkg::ImagePlan::download() {
+    for(auto pkg: packages) {
+        /*
+        std::string origins = config.getPublisher(pkg.publisher).get<std::string>("origins");
+        //TODO This for loop could be Multithreaded
+        //TODO Progress reporting
+        for (auto origin: origins) {
+            std::vector<std::string> splited;
+            //boost::split(splited, origin, boost::is_any_of("/"));
+            //boost::erase_all(splited[0], ":");
+            HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
+            //Get Manifest from url or local dir if already present
+            std::string cacheDir = CACHE_ROOT+"/"+pkg.getFmri();
+            if(!boost::filesystem::is_directory(cacheDir)){
+                boost::filesystem::create_directories(cacheDir);
+            }
+
+            if(!boost::filesystem::exists(cacheDir+"/manifest")) {
+                std::ofstream manifest(cacheDir+"/manifest");
+                client.getManifest(pkg.getFmri(), manifest);
+            }
+            //Get all the files for installation
+            //For file in pkg.files do.
+        }
+         */
+    }
+}
 
 void pkg::ImagePlan::install() {
-    //Get Manifest from url or local dir if already present
-
-    //Get all the files for installation
-
     //Count all Actions (helper in package)
 
     //Call install on all installable actions
-
-
 }
 
 bool pkg::ImagePlan::contains(const pkg::PackageInfo &pkg) {
@@ -35,13 +59,16 @@ void pkg::ImagePlan::add(const pkg::PackageInfo &pkg) {
     packages.push_back(pkg);
 }
 
-pkg::ImagePlan::ImagePlan(const std::vector<pkg::PackageInfo> &packages) {
-    add(packages);
-}
-
 void pkg::ImagePlan::add(const std::vector<pkg::PackageInfo> &pkgs) {
     for(auto pkg: pkgs){
         add(pkg);
     }
+}
+
+pkg::ImagePlan::ImagePlan(const std::vector<pkg::PackageInfo> &packages, const pkg::ImageConfig &config, const std::string& cache)
+                :config(config),
+                 CACHE_ROOT(cache)
+{
+    add(packages);
 }
 

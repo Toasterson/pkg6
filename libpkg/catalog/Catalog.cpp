@@ -12,7 +12,6 @@
 #include <rapidjson/ostreamwrapper.h>
 
 namespace fs = boost::filesystem;
-using namespace boost::property_tree;
 using namespace rapidjson;
 
 void pkg::Catalog::upgrade_format(const std::string &newRoot) {

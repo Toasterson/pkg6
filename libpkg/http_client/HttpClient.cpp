@@ -17,47 +17,22 @@ using namespace boost::asio;
 using namespace beast;
 
 void HttpClient::getVersion_0() {
-    int status = 0;
-    try{
-        io_service ios;
-        ip::tcp::resolver r{ios};
-        ip::tcp::socket sock{ios};
-        connect(sock,
-                r.resolve(ip::tcp::resolver::query{host, protocol}));
-
-        http::request_v1<beast::http::string_body> request;
-        request.method = "GET";
-        request.url = (base_path + "/versions/0");
-        request.version = 11;
-        request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
-        request.headers.replace("User-Agent", USER_AGENT);
-        http::prepare(request);
-        http::write(sock, request);
-
-        // Receive and print HTTP response using beast
-        beast::streambuf sb;
-        http::response_v1<beast::http::string_body> resp;
-        http::read(sock, sb, resp);
-        status = resp.status;
-        string body = resp.body;
-        vector<string> v_body;
-        boost::split(v_body, body, boost::is_any_of("\n"));
-        for(auto line: v_body) {
-            vector<string> v_line;
-            boost::split(v_line, line, boost::is_any_of(" "));
-            if(v_line[0] != "pkg-server"){
-                string name = v_line[0];
-                v_line.erase(v_line.begin());
-                int value = 0;
-                for(auto val: v_line){
-                    value = stoi(val);
-                }
-                SERVER_VERSION.insert(pair<string,int>(name, value));
+    http::response_v1<beast::http::string_body> resp = makeStringHTTPRequest(base_path + "/versions/0");
+    string body = resp.body;
+    vector<string> v_body;
+    boost::split(v_body, body, boost::is_any_of("\n"));
+    for(auto line: v_body) {
+        vector<string> v_line;
+        boost::split(v_line, line, boost::is_any_of(" "));
+        if(v_line[0] != "pkg-server"){
+            string name = v_line[0];
+            v_line.erase(v_line.begin());
+            int value = 0;
+            for(auto val: v_line){
+                value = stoi(val);
             }
+            SERVER_VERSION.insert(pair<string,int>(name, value));
         }
-    } catch (...){
-        cerr << "Error while parsing response froms server.";
-        throw pkg::exception::HTTPBadResponseException(status);
     }
 
 }
