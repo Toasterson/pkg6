@@ -70,8 +70,10 @@ std::tm pkg::Image::getLastModified() {
 void pkg::Image::upgrade_format(std::string newRoot) {
     if(newRoot == ""){
         //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
-        newRoot = IMAGE_ROOT_PATH;
+        cerr << "-R must be provided libbe support currently not developed";
+        throw std::exception();
     }
+    newRoot += IMAGE_ROOT_PATH;
     if(!fs::is_directory(fs::system_complete(newRoot))){
         fs::create_directories(fs::system_complete(newRoot));
     }
@@ -81,10 +83,6 @@ void pkg::Image::upgrade_format(std::string newRoot) {
     config.upgrade_format(newRoot);
     installed.upgrade_format(newRoot);
     known.upgrade_format(newRoot);
-}
-
-void pkg::Image::importpkg5() {
-
 }
 
 bool pkg::Image::needsUpgrade() {

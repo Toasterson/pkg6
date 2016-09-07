@@ -153,7 +153,7 @@ namespace pkg {
                 this->publisher = rootValue["publisher"].GetString();
                 this->name = rootValue["name"].GetString();
                 this->version = rootValue["version"].GetString();
-                if(!signature.empty()) {
+                if(rootValue.HasMember("signature")) {
                     this->signature = rootValue["signature"].GetString();
                 }
                 this->summary = rootValue["summary"].GetString();

@@ -6,11 +6,11 @@
 #ifndef PKG6_IMAGECONFIG_H
 #define PKG6_IMAGECONFIG_H
 
+
+#include <publisher/Publisher.h>
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/filesystem/operations.hpp>
-#include <publisher/Publisher.h>
 
 
 namespace pkg {
@@ -32,15 +32,73 @@ namespace pkg {
         pkg::Publisher getFirstPublisher();
         std::string getImageProperty(const std::string& name);
 
-        void set(const std::string& path, const std::string& value);
+        void setVariant(const std::string& name, const std::string& value);
+        void setImageProperty(const std::string& name, const std::string& value);
+        void setPublisher(const std::string& name, const Publisher& value);
 
         ImageConfig()= default;
         ImageConfig(const std::string& root);
-        void load(const std::istream& config);
-        void save();
+        void load(std::istream& config);
         void save(std::ostream& output);
         void upgrade_format(const std::string &newRoot);
         void importpkg5(std::istream& oldconfig);
+
+        template <typename Writer>
+        void Serialize(Writer& writer) const{
+            writer.StartObject();
+            writer.String("version");
+            writer.Int(VERSION);
+
+            //Variants
+            writer.String("variants");
+            writer.StartObject();
+            for(auto pair : variants){
+                writer.String(pair.first.c_str());
+                writer.String(pair.second.c_str());
+            }
+            writer.EndObject();
+
+            //Properties
+            writer.String("properties");
+            writer.StartObject();
+            for(auto pair : properties){
+                writer.String(pair.first.c_str());
+                writer.String(pair.second.c_str());
+            }
+            writer.EndObject();
+
+            //Publishers
+            writer.String("publishers");
+            writer.StartObject();
+            for(auto pair : publishers){
+                writer.String(pair.first.c_str());
+                pair.second.Serialize(writer);
+            }
+            writer.EndObject();
+            writer.EndObject();
+        }
+
+        void Deserialize(const Value& rootValue){
+            VERSION = rootValue["version"].GetInt();
+            if(rootValue.HasMember("variants")) {
+                for (auto itr = rootValue["variants"].MemberBegin(); itr != rootValue["variants"].MemberEnd(); ++itr) {
+                    variants.insert(pair<string,string>(itr->name.GetString(), itr->value.GetString()));
+                }
+            }
+            if(rootValue.HasMember("properties")) {
+                for (auto itr = rootValue["properties"].MemberBegin(); itr != rootValue["properties"].MemberEnd(); ++itr) {
+                    properties.insert(pair<string,string>(itr->name.GetString(), itr->value.GetString()));
+                }
+            }
+            if(rootValue.HasMember("publishers")) {
+                for (auto itr = rootValue["publishers"].MemberBegin(); itr != rootValue["publishers"].MemberEnd(); ++itr) {
+                    Publisher pub;
+                    pub.Deserialize(itr->value);
+                    publishers.insert(pair<string,Publisher>(itr->name.GetString(), pub));
+                }
+            }
+        }
+
     };
 };
 

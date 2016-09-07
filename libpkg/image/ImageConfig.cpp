@@ -10,6 +10,10 @@
 #include <sstream>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/writer.h>
 
 using namespace std;
 
@@ -20,7 +24,8 @@ pkg::ImageConfig::ImageConfig(const std::string &root):
         std::ifstream ifstream1(IMAGE_ROOT+"/"+IMAGE_CONFIG_OLDFILENAME);
         importpkg5(ifstream1);
     } else {
-        load(std::ifstream(IMAGE_ROOT+"/"+IMAGE_CONFIG_FILENAME));
+        std::ifstream ifstream1(IMAGE_ROOT+"/"+IMAGE_CONFIG_FILENAME);
+        load(ifstream1);
     }
 }
 
@@ -66,7 +71,7 @@ void pkg::ImageConfig::importpkg5(istream& oldconfig) {
             } else if(id == "origins"){
                 val.erase(0, 2);
                 val.erase(val.size()-2, val.size());
-                publishers[publisher].setGeneralProperty("origins", val);
+                publishers[publisher].addOrigin(val);
             } else if(id == "alias"){
                 publishers[publisher].setGeneralProperty("alias", val);
             } else if(id == "prefix"){
@@ -91,27 +96,26 @@ void pkg::ImageConfig::importpkg5(istream& oldconfig) {
     }
 }
 
-void pkg::ImageConfig::load(const std::istream &config) {
-
-}
-
-void pkg::ImageConfig::save() {
-    if(VERSION < 4){
-        throw pkg::exception::ImageConfigException("Image must be upgraded first");
-    }
-
-
+void pkg::ImageConfig::load(std::istream &config) {
+    IStreamWrapper isw(config);
+    Document doc;
+    doc.ParseStream(isw);
+    this->Deserialize(doc);
 }
 
 void pkg::ImageConfig::save(std::ostream &output) {
     if(VERSION < 4){
         throw pkg::exception::ImageConfigException("Image must be upgraded first");
     }
-
+    OStreamWrapper osw(output);
+    Writer<OStreamWrapper> writer(osw);
+    this->Serialize(writer);
 }
 
 void pkg::ImageConfig::upgrade_format(const std::string &newRoot) {
-
+    IMAGE_ROOT = newRoot;
+    ofstream ofs(IMAGE_ROOT + "/" + IMAGE_CONFIG_FILENAME);
+    save(ofs);
 }
 
 std::string pkg::ImageConfig::getVariant(const std::string &name) {
@@ -130,26 +134,17 @@ pkg::Publisher pkg::ImageConfig::getFirstPublisher() {
     return publishers.begin()->second;
 }
 
-
-/*
- * void pkg::Catalog::savePackage(pkg::PackageInfo &pkg) {
-    //Save Package to disk as one json per package
-    ofstream ofs(statePath()+"/"+pkg.getFilePath());
-    OStreamWrapper osw(ofs);
-    Writer<OStreamWrapper> writer(osw);
-    pkg.Serialize(writer);
+void pkg::ImageConfig::setPublisher(const std::string &name, const pkg::Publisher &value) {
+    publishers[name] = value;
 }
 
-void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
-    ifstream ifs(statePath()+"/"+pkg.getFilePath());
-    IStreamWrapper isw(ifs);
-    Document doc;
-    doc.ParseStream(isw);
-    pkg.Deserialize(doc);
+void pkg::ImageConfig::setImageProperty(const std::string &name, const std::string &value) {
+    properties[name] = value;
 }
- *
- *
- */
+
+void pkg::ImageConfig::setVariant(const std::string &name, const std::string &value) {
+    variants[name] = value;
+}
 
 
 
