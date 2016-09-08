@@ -24,7 +24,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/vectoradd.h
         libpkg/package/PackageException.h libpkg/image/ImagePlan.cpp
         libpkg/image/ImagePlan.h libpkg/catalog/CatalogError.h
-        libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h libpkg/http_client/HTTPException.h libpkg/image/ImageException.h libpkg/publisher/Publisher.h)
+        libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h libpkg/http_client/HTTPException.h libpkg/image/ImageException.h libpkg/publisher/Publisher.h libpkg/action/FileAction.cpp libpkg/action/FileAction.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)

@@ -24,11 +24,11 @@ bool pkg::Image::isLocked() {
 }
 
 std::string pkg::Image::getWriteCachePath() {
-    return "";
+    return image_root + "/cache";
 }
 
 std::string pkg::Image::getArch() {
-    return config.getVariant("variant.arch");
+    return config.getVariant("arch");
 }
 
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
@@ -91,7 +91,7 @@ bool pkg::Image::needsUpgrade() {
 
 pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
     std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
-    pkg::ImagePlan plan(config, getImgDir()+"/cache");
+    pkg::ImagePlan plan(config, getWriteCachePath());
     for(auto pkg : resolved){
         if(!installed.contains(pkg) and !plan.contains(pkg)){
             getNotInstalledDeps(pkg, plan);

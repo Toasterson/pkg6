@@ -25,7 +25,6 @@ namespace pkg{
                 parseActionString(action_string);
             }
 
-            std::string action_type;
             std::string name;
             std::vector<std::string> values;
             std::map<std::string,std::string> optionals;

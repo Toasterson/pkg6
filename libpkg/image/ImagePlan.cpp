@@ -7,16 +7,17 @@
 #include <http_client/HttpClient.h>
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 void pkg::ImagePlan::download() {
     for(auto pkg: packages) {
-        /*
-        std::string origins = config.getPublisher(pkg.publisher).get<std::string>("origins");
+        vector<string> origins = config.getPublisher(pkg.publisher).getOrigins();
         //TODO This for loop could be Multithreaded
         //TODO Progress reporting
         for (auto origin: origins) {
             std::vector<std::string> splited;
-            //boost::split(splited, origin, boost::is_any_of("/"));
-            //boost::erase_all(splited[0], ":");
+            boost::split(splited, origin, boost::is_any_of("/"));
+            boost::erase_all(splited[0], ":");
             HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
             //Get Manifest from url or local dir if already present
             std::string cacheDir = CACHE_ROOT+"/"+pkg.getFmri();
@@ -29,9 +30,12 @@ void pkg::ImagePlan::download() {
                 client.getManifest(pkg.getFmri(), manifest);
             }
             //Get all the files for installation
-            //For file in pkg.files do.
+            for(auto file : pkg.files){
+                std::ofstream filestream(cacheDir+"/"+file.name);
+                client.getFile(file.name, filestream);
+            }
+            continue;
         }
-         */
     }
 }
 
