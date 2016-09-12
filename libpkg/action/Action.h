@@ -12,6 +12,8 @@
 namespace pkg{
     class Action {
     public :
+        Action(){}
+        explicit Action(const std::string& type): action_type(type){}
         std::string action_type;
 
         std::vector<std::string> tokenize(std::string action_string);

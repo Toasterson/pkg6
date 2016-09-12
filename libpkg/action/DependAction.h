@@ -15,14 +15,13 @@ using namespace rapidjson;
 
 namespace pkg{
     namespace action{
-        class DependAction: Action{
+        class DependAction: public Action{
         public:
-            DependAction(): action_type("depend"){}
-            DependAction(const std::string &action_string): action_type("depend") {
+            DependAction(): Action("depend"){}
+            explicit DependAction(const std::string &action_string): Action("depend") {
                     parseActionString(action_string);
             }
 
-            std::string action_type;
             std::string fmri;
             std::string type;
             std::string predicate;

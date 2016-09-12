@@ -24,7 +24,10 @@ set(LIBPKG_SOURCE_FILES
         libpkg/vectoradd.h
         libpkg/package/PackageException.h libpkg/image/ImagePlan.cpp
         libpkg/image/ImagePlan.h libpkg/catalog/CatalogError.h
-        libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h libpkg/http_client/HTTPException.h libpkg/image/ImageException.h libpkg/publisher/Publisher.h libpkg/action/FileAction.cpp libpkg/action/FileAction.h)
+        libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h
+        libpkg/http_client/HTTPException.h libpkg/image/ImageException.h
+        libpkg/publisher/Publisher.h
+        libpkg/action/FileAction.cpp libpkg/action/FileAction.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)
@@ -34,6 +37,13 @@ target_link_libraries(pkg debug pkg6 boost_program_options)
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(pkg_tests libpkg/action_tests/AttributeActionTest.cpp libpkg/package_tests/PackageInfoTest.cpp libpkg/action_tests/DependActionTest.cpp libpkg/http_client_tests/HttpClientTest.cpp libpkg/image_tests/ImagePlanTest.cpp libpkg/image_tests/ImageConfigTest.cpp)
+add_executable(pkg_tests
+        libpkg/action_tests/AttributeActionTest.cpp
+        libpkg/package_tests/PackageInfoTest.cpp
+        libpkg/action_tests/DependActionTest.cpp
+
+        libpkg/image_tests/ImagePlanTest.cpp
+        libpkg/image_tests/ImageConfigTest.cpp
+        libpkg/action_tests/FileActionTest.cpp)
 target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
 add_test(AllTestInPKG6 pkg_tests)

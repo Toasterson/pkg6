@@ -18,10 +18,10 @@ using namespace rapidjson;
 
 namespace pkg{
     namespace action {
-        class AttributeAction : Action{
+        class AttributeAction: public Action{
         public:
-            AttributeAction(): action_type("set"){}
-            AttributeAction(const std::string &action_string): action_type("set") {
+            AttributeAction(): Action("set"){}
+            explicit AttributeAction(const std::string &action_string): Action("set") {
                 parseActionString(action_string);
             }
 

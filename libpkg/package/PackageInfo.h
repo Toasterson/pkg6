@@ -13,6 +13,7 @@
 #include "image/LicenseInfo.h"
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
+#include <action/Action.h>
 #include <action/AttributeAction.h>
 #include <action/DependAction.h>
 #include <action/DirectoryAction.h>
