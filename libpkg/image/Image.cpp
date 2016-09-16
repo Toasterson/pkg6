@@ -7,6 +7,7 @@
 #include <package/PackageException.h>
 #include "Image.h"
 #include <vectoradd.h>
+#include <http_client/HttpClient.h>
 
 namespace fs = boost::filesystem;
 
@@ -42,7 +43,7 @@ pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     blocking_locks{false},
     version{6}
 {
-    if(known.needsUpgrade() or installed.needsUpgrade()){
+    if(known.needsUpgrade() or installed.needsUpgrade() or config.needs_upgrade){
         this->upgrade_needed = true;
     }
 }
@@ -77,19 +78,20 @@ std::tm pkg::Image::getLastModified() {
 void pkg::Image::upgrade_format(std::string newRoot) {
     if(newRoot == ""){
         //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
-        cerr << "-R must be provided libbe support currently not developed";
+        cerr << "Libbe is currently not integrated. Cannot upgrade image inplace. must have New root specified. Use -NS";
         throw std::exception();
     }
+    //TODO add correct IMAGE_ROOT_PATH to newRoot Path if we are a full image.
     newRoot += IMAGE_ROOT_PATH;
+
     if(!fs::is_directory(fs::system_complete(newRoot))){
         fs::create_directories(fs::system_complete(newRoot));
     }
-    //TODO add IMAGE_ROOT_PATH to newRoot Path if we are a full image.
-
     history.upgrade_format(newRoot);
     config.upgrade_format(newRoot);
     installed.upgrade_format(newRoot);
     known.upgrade_format(newRoot);
+    upgrade_needed = false;
 }
 
 bool pkg::Image::needsUpgrade() {
@@ -98,7 +100,7 @@ bool pkg::Image::needsUpgrade() {
 
 pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
     std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
-    pkg::ImagePlan plan(config, getWriteCachePath());
+    pkg::ImagePlan plan(getImgRoot(), getWriteCachePath(), config);
     for(auto pkg : resolved){
         if(!installed.contains(pkg) and !plan.contains(pkg)){
             getNotInstalledDeps(pkg, plan);

@@ -23,6 +23,7 @@ pkg::ImageConfig::ImageConfig(const std::string &root):
     if(boost::filesystem::is_regular_file(IMAGE_ROOT+"/"+IMAGE_CONFIG_OLDFILENAME)){
         std::ifstream ifstream1(IMAGE_ROOT+"/"+IMAGE_CONFIG_OLDFILENAME);
         importpkg5(ifstream1);
+        needs_upgrade=true;
     } else {
         std::ifstream ifstream1(IMAGE_ROOT+"/"+IMAGE_CONFIG_FILENAME);
         load(ifstream1);

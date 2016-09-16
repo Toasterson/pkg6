@@ -26,6 +26,7 @@ namespace pkg {
     public:
         int getVersion() { return VERSION; };
 
+        bool needs_upgrade{false};
 
         std::string getVariant(const std::string& name);
         pkg::Publisher getPublisher(const std::string& name);

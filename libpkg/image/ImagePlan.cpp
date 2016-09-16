@@ -9,39 +9,8 @@
 
 using namespace std;
 
-
-void pkg::ImagePlan::getManifests() {
-    for (auto pkg: packages) {
-        Progress progress("Downloading Manifests", "", (const int &) packages.size());
-        for (auto origin: config.getPublisher(pkg.publisher).getOrigins()) {
-            //Make http request to first host that works
-            try {
-                std::vector<std::string> splited;
-                boost::split(splited, origin, boost::is_any_of("/"));
-                boost::erase_all(splited[0], ":");
-                HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
-                std::string cacheDir = CACHE_ROOT + "/" + pkg.getFmri();
-                if (!boost::filesystem::is_directory(cacheDir)) {
-                    boost::filesystem::create_directories(cacheDir);
-                }
-
-                if (!boost::filesystem::exists(cacheDir + "/manifest")) {
-                    std::ofstream manifest(cacheDir + "/manifest");
-                    client.getManifest(pkg.getFmri(), manifest);
-                }
-                progress++;
-                //If we have the file skip getting it from other hosts
-                continue;
-            } catch (...) {
-                //TODO find out how to catch http exception
-            }
-        }
-    }
-}
-
 void pkg::ImagePlan::download() {
-    getManifests();
-    commitManifests();
+    getPackageMetadata();
     //TODO Progress reporting with Megabytes Downloaded
     for(auto pkg: packages) {
         vector<string> origins = config.getPublisher(pkg.publisher).getOrigins();
@@ -97,17 +66,38 @@ void pkg::ImagePlan::add(const std::vector<pkg::PackageInfo> &pkgs) {
     }
 }
 
-pkg::ImagePlan::ImagePlan(const std::vector<pkg::PackageInfo> &packages, const pkg::ImageConfig &config, const std::string& cache) :
-        config(config),
-        CACHE_ROOT(cache)
-{
-    add(packages);
-}
+void pkg::ImagePlan::getPackageMetadata() {
+    Progress progDownload("Downloading Manifests", "", (const int &) packages.size());
+    for (auto pkg: packages) {
+        for (auto origin: config.getPublisher(pkg.publisher).getOrigins()) {
+            //Make http request to first host that works
+            try {
+                std::vector<std::string> splited;§
+                boost::split(splited, origin, boost::is_any_of("/"));
+                boost::erase_all(splited[0], ":");
+                HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
+                std::string cacheDir = CACHE_ROOT + "/" + pkg.getFmri();
+                if (!boost::filesystem::is_directory(cacheDir)) {
+                    boost::filesystem::create_directories(cacheDir);
+                }
 
-void pkg::ImagePlan::commitManifests() {
-    for(auto pkg: packages){
-        ifstream manifest(CACHE_ROOT+"/"+pkg.getFmri()+"/manifest");
+                if (!boost::filesystem::exists(cacheDir + "/manifest")) {
+                    std::ofstream manifest(cacheDir + "/manifest");
+                    client.getManifest(pkg.getFmri(), manifest);
+                }
+                progDownload++;
+                //If we have the file skip getting it from other hosts
+                continue;
+            } catch (...) {
+                //TODO find out how to catch http exception
+            }
+        }
+    }
+    Progress progCommit("Commiting Manifests", "", (const int &) packages.size());
+    for(auto pkg:packages) {
+        ifstream manifest(CACHE_ROOT + "/" + pkg.getFmri() + "/manifest");
         pkg.commitManifest(manifest);
+        progCommit++;
     }
 }
 

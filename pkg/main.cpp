@@ -13,6 +13,7 @@ int main(int argc, const char** argv) {
         opt::options_description global("Global Options");
         global.add_options()
                 ("R", opt::value<std::string>()->required(), "Image root to modify defaults to /")
+                ("N", opt::value<std::string>(), "Location where a copy of the Boot Environment lies")
                 ("help,h", "produce help output")
                 ("command", opt::value<std::string>()->required(), "command to execute")
                 ("subargs", opt::value<std::vector<std::string>>(), "Arguments for command");
@@ -109,18 +110,17 @@ int main(int argc, const char** argv) {
              *
              */
             std::string IMAGE_ROOT = "/";
-            if(variables_map.count("R")){
-                IMAGE_ROOT = variables_map["R"].as<std::string>();
-            }
+            IMAGE_ROOT = variables_map["R"].as<std::string>();
             pkg::Image image = Image(IMAGE_ROOT);
             try {
-                pkg::ImagePlan imgplan = image.makePlan(packages);
                 if(image.needsUpgrade()){
-                    image.upgrade_format();
+                    image.upgrade_format(variables_map["N"].as<std::string>());
                 }
+                pkg::ImagePlan imgplan = image.makePlan(packages);
                 imgplan.install();
+                //TODO History of executed action.
             }
-            catch (std::exception e){
+            catch (std::exception &e){
                 cerr << e.what() << endl;
                 return false;
             }
