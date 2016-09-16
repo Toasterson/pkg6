@@ -37,7 +37,7 @@ namespace pkg {
         void setPublisher(const std::string& name, const Publisher& value);
 
         ImageConfig()= default;
-        ImageConfig(const std::string& root);
+        explicit ImageConfig(const std::string& root);
         void load(std::istream& config);
         void save(std::ostream& output);
         void upgrade_format(const std::string &newRoot);

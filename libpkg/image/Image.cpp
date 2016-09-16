@@ -37,7 +37,10 @@ pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     config(pkg::ImageConfig(getImgDir())),
     history(pkg::history::History(getImgDir()+"/history")),
     installed(pkg::Catalog(getImgDir(), CATALOG_INSTALLED)),
-    known(pkg::Catalog(getImgDir(), CATALOG_KNOWN))
+    known(pkg::Catalog(getImgDir(), CATALOG_KNOWN)),
+    locked{false},
+    blocking_locks{false},
+    version{6}
 {
     if(known.needsUpgrade() or installed.needsUpgrade()){
         this->upgrade_needed = true;
@@ -45,11 +48,15 @@ pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
 }
 
 void pkg::Image::lock(const bool &allow_unprevileged) {
-
+    locked = true;
+    ofstream ofs((getImgRoot()+"/locked").c_str());
+    ofs << locked;
+    ofs.close();
 }
 
 void pkg::Image::unlock() {
-
+    locked = false;
+    fs::remove(fs::path((getImgRoot()+"/locked").c_str()));
 }
 
 int pkg::Image::getImageType() {

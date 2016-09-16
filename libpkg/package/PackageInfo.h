@@ -17,6 +17,7 @@
 #include <action/AttributeAction.h>
 #include <action/DependAction.h>
 #include <action/DirectoryAction.h>
+#include <action/FileAction.h>
 
 using namespace rapidjson;
 using namespace  pkg::action;
@@ -65,7 +66,7 @@ namespace pkg {
         std::vector<DependAction> dependencies;
         std::vector<DirectoryAction> dirs;
         std::vector<AttributeAction> links;
-        std::vector<AttributeAction> files;
+        std::vector<FileAction> files;
 
         PackageInfo(){}
         PackageInfo(const std::string& publisher, const std::string& name, const std::string& version): publisher(publisher), name(name), version(version){}
@@ -85,6 +86,8 @@ namespace pkg {
         void setFmri(const std::string& fmri);
 
         void addAction(const std::string& action_string);
+
+        void commitManifest(istream& manifest);
 
         void markObsolete();
 

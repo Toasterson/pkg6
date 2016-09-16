@@ -9,40 +9,68 @@
 
 using namespace std;
 
+
+void pkg::ImagePlan::getManifests() {
+    for (auto pkg: packages) {
+        Progress progress("Downloading Manifests", "", (const int &) packages.size());
+        for (auto origin: config.getPublisher(pkg.publisher).getOrigins()) {
+            //Make http request to first host that works
+            try {
+                std::vector<std::string> splited;
+                boost::split(splited, origin, boost::is_any_of("/"));
+                boost::erase_all(splited[0], ":");
+                HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
+                std::string cacheDir = CACHE_ROOT + "/" + pkg.getFmri();
+                if (!boost::filesystem::is_directory(cacheDir)) {
+                    boost::filesystem::create_directories(cacheDir);
+                }
+
+                if (!boost::filesystem::exists(cacheDir + "/manifest")) {
+                    std::ofstream manifest(cacheDir + "/manifest");
+                    client.getManifest(pkg.getFmri(), manifest);
+                }
+                progress++;
+                //If we have the file skip getting it from other hosts
+                continue;
+            } catch (...) {
+                //TODO find out how to catch http exception
+            }
+        }
+    }
+}
+
 void pkg::ImagePlan::download() {
+    getManifests();
+    commitManifests();
+    //TODO Progress reporting with Megabytes Downloaded
     for(auto pkg: packages) {
         vector<string> origins = config.getPublisher(pkg.publisher).getOrigins();
-        //TODO This for loop could be Multithreaded
-        //TODO Progress reporting
+        //TODO Check if we want multithreading here
         for (auto origin: origins) {
-            std::vector<std::string> splited;
-            boost::split(splited, origin, boost::is_any_of("/"));
-            boost::erase_all(splited[0], ":");
-            HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
-            //Get Manifest from url or local dir if already present
-            std::string cacheDir = CACHE_ROOT+"/"+pkg.getFmri();
-            if(!boost::filesystem::is_directory(cacheDir)){
-                boost::filesystem::create_directories(cacheDir);
+            //Make http request to first host that works
+            try {
+                std::vector<std::string> splited;
+                boost::split(splited, origin, boost::is_any_of("/"));
+                boost::erase_all(splited[0], ":");
+                HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);
+                std::string cacheDir = CACHE_ROOT+"/"+pkg.getFmri();
+                //Get all the files for installation
+                for(auto file : pkg.files){
+                    std::ofstream filestream(cacheDir+"/"+file.name);
+                    client.getFile(file.name, filestream);
+                    //TODO Check for file corruption
+                }
+                //If we have the file skip getting it from other hosts
+                continue;
+            } catch (...){
+                //TODO find out how to catch http exception
             }
-
-            if(!boost::filesystem::exists(cacheDir+"/manifest")) {
-                std::ofstream manifest(cacheDir+"/manifest");
-                client.getManifest(pkg.getFmri(), manifest);
-            }
-            //Get all the files for installation
-            for(auto file : pkg.files){
-                std::ofstream filestream(cacheDir+"/"+file.name);
-                client.getFile(file.name, filestream);
-            }
-            continue;
         }
     }
 }
 
 void pkg::ImagePlan::install() {
-    //Count all Actions (helper in package)
-
-    //Call install on all installable actions
+    download();
 }
 
 bool pkg::ImagePlan::contains(const pkg::PackageInfo &pkg) {
@@ -69,10 +97,17 @@ void pkg::ImagePlan::add(const std::vector<pkg::PackageInfo> &pkgs) {
     }
 }
 
-pkg::ImagePlan::ImagePlan(const std::vector<pkg::PackageInfo> &packages, const pkg::ImageConfig &config, const std::string& cache)
-                :config(config),
-                 CACHE_ROOT(cache)
+pkg::ImagePlan::ImagePlan(const std::vector<pkg::PackageInfo> &packages, const pkg::ImageConfig &config, const std::string& cache) :
+        config(config),
+        CACHE_ROOT(cache)
 {
     add(packages);
+}
+
+void pkg::ImagePlan::commitManifests() {
+    for(auto pkg: packages){
+        ifstream manifest(CACHE_ROOT+"/"+pkg.getFmri()+"/manifest");
+        pkg.commitManifest(manifest);
+    }
 }
 

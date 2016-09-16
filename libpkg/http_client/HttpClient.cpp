@@ -120,8 +120,6 @@ beast::http::response_v1<beast::http::streambuf_body> HttpClient::makeStreamHTTP
     return resp;
 }
 
-
-//TODO Check if these actions could be async and how
 void HttpClient::getFile(const std::string &sha1, std::ostream &savePath) {
     if(SERVER_VERSION["file"] == 1){
         getFile_1(sha1, savePath);

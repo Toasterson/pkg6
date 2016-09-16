@@ -42,7 +42,7 @@ void pkg::PackageInfo::addAction(const std::string &action_string) {
         } else if (boost::algorithm::starts_with(action_string, "dir")) {
             dirs.push_back(DirectoryAction(action_string));
         } else if (boost::algorithm::starts_with(action_string, "file")) {
-
+            files.push_back(FileAction(action_string));
         } else if (boost::algorithm::starts_with(action_string, "link")) {
 
         } else if (boost::algorithm::starts_with(action_string, "hardlink")) {
@@ -111,11 +111,19 @@ void pkg::PackageInfo::markObsolete() {
     this->obsolete = true;
     this->summary.clear();
     this->dependencies.clear();
+    this->files.clear();
 }
 
 void pkg::PackageInfo::markRenamed() {
     this->renamed = true;
     this->summary.clear();
+}
+
+void pkg::PackageInfo::commitManifest(istream &manifest) {
+    for (std::string line; std::getline(manifest, line);){
+        addAction(line);
+    }
+    //TODO Fill attributes from actions like csize size etc.
 }
 
 

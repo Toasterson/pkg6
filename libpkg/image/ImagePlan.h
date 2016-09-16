@@ -29,9 +29,13 @@ namespace pkg {
 
         bool contains(const std::string &fmri);
 
-        void install();
+        void getManifests();
+
+        void commitManifests();
 
         void download();
+
+        void install();
 
         bool empty(){
             return packages.empty();
