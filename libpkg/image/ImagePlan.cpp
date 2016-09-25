@@ -72,7 +72,7 @@ void pkg::ImagePlan::getPackageMetadata() {
         for (auto origin: config.getPublisher(pkg.publisher).getOrigins()) {
             //Make http request to first host that works
             try {
-                std::vector<std::string> splited;§
+                std::vector<std::string> splited;
                 boost::split(splited, origin, boost::is_any_of("/"));
                 boost::erase_all(splited[0], ":");
                 HttpClient client(splited[0], splited[1], splited[2], pkg.publisher);

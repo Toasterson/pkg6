@@ -34,6 +34,30 @@ namespace pkg{
                 return m_msg.c_str();
             }
         };
+
+        class PackageLoadException : public std::exception {
+        private:
+            std::string m_msg;
+        public:
+            PackageLoadException(const std::string& pkg)
+                    : m_msg(std::string("can not load ")+pkg)
+            {}
+            virtual const char *what() const throw() {
+                return m_msg.c_str();
+            }
+        };
+
+        class PackageSaveException : public std::exception {
+        private:
+            std::string m_msg;
+        public:
+            PackageSaveException(const std::string& pkg)
+                    : m_msg(std::string("can not save ")+pkg)
+            {}
+            virtual const char *what() const throw() {
+                return m_msg.c_str();
+            }
+        };
     }
 }
 #endif //PKG6_CATALOGERROR_H

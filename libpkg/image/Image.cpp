@@ -33,15 +33,16 @@ std::string pkg::Image::getArch() {
 }
 
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
-    image_root(root),
+    image_root{root},
     allow_ondisk_upgrade(allow_ondisk_upgrade),
-    config(pkg::ImageConfig(getImgDir())),
-    history(pkg::history::History(getImgDir()+"/history")),
-    installed(pkg::Catalog(getImgDir(), CATALOG_INSTALLED)),
-    known(pkg::Catalog(getImgDir(), CATALOG_KNOWN)),
+    config(pkg::ImageConfig(root+"/"+IMAGE_ROOT_PATH)),
+    history(pkg::history::History(root+"/"+IMAGE_ROOT_PATH+"/history")),
+    installed(pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_INSTALLED)),
+    known(pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_KNOWN)),
     locked{false},
     blocking_locks{false},
-    version{6}
+    version{6},
+    upgrade_needed{false}
 {
     if(known.needsUpgrade() or installed.needsUpgrade() or config.needs_upgrade){
         this->upgrade_needed = true;
@@ -76,11 +77,11 @@ std::tm pkg::Image::getLastModified() {
 }
 
 void pkg::Image::upgrade_format(std::string newRoot) {
-    if(newRoot == ""){
+    //if(newRoot == ""){
         //TODO When we get libbe support add call to make new be and set image_root to new be + IMAGE_ROOT_PATH allow_ondisk_upgrade then says if we make new be or not for now we don't
-        cerr << "Libbe is currently not integrated. Cannot upgrade image inplace. must have New root specified. Use -NS";
-        throw std::exception();
-    }
+        //cerr << "Libbe is currently not integrated. Cannot upgrade image inplace. must have New root specified. Use -NS";
+        //throw std::exception();
+    //}
     //TODO add correct IMAGE_ROOT_PATH to newRoot Path if we are a full image.
     newRoot += IMAGE_ROOT_PATH;
 

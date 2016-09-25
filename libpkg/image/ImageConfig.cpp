@@ -18,7 +18,8 @@
 using namespace std;
 
 pkg::ImageConfig::ImageConfig(const std::string &root):
-    IMAGE_ROOT(root)
+    IMAGE_ROOT(root),
+    needs_upgrade{false}
 {
     if(boost::filesystem::is_regular_file(IMAGE_ROOT+"/"+IMAGE_CONFIG_OLDFILENAME)){
         std::ifstream ifstream1(IMAGE_ROOT+"/"+IMAGE_CONFIG_OLDFILENAME);
@@ -35,6 +36,11 @@ void pkg::ImageConfig::importpkg5(istream& oldconfig) {
     string section;
     for (std::string line; std::getline(oldconfig, line); )
     {
+        if(line == ""){
+            //Jump over empty lines.
+            continue;
+        }
+
         std::istringstream iss(line);
         std::string id, val;
 

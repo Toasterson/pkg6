@@ -104,6 +104,7 @@ void pkg::PackageInfo::setFmri(const std::string &fmri) {
     fmritmp.erase(0, fmritmp.find("/"));
     name = fmritmp.substr(0, fmritmp.find("@"));
     fmritmp.erase(0, fmritmp.find("@"));
+    //TODO parse version into pieces
     version = fmritmp;
 }
 

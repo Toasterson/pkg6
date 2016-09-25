@@ -7,7 +7,7 @@ using namespace pkg;
 namespace opt = boost::program_options;
 
 int main(int argc, const char** argv) {
-    try {
+    //try {
 
 
         opt::options_description global("Global Options");
@@ -109,23 +109,20 @@ int main(int argc, const char** argv) {
              *
              *
              */
-            std::string IMAGE_ROOT = "/";
+            std::string IMAGE_ROOT = "/", NEW_ROOT = "";
             IMAGE_ROOT = variables_map["R"].as<std::string>();
+            if(variables_map.count("N") == 1) {
+                NEW_ROOT = variables_map["N"].as<std::string>();
+            }
             pkg::Image image = Image(IMAGE_ROOT);
-            try {
-                if(image.needsUpgrade()){
-                    image.upgrade_format(variables_map["N"].as<std::string>());
-                }
-                pkg::ImagePlan imgplan = image.makePlan(packages);
-                imgplan.install();
-                //TODO History of executed action.
+            if(image.needsUpgrade()){
+                image.upgrade_format(NEW_ROOT);
             }
-            catch (std::exception &e){
-                cerr << e.what() << endl;
-                return false;
-            }
+            pkg::ImagePlan imgplan = image.makePlan(packages);
+            imgplan.install();
+            //TODO History of executed action.
         }
-    }
+    /*}
     catch (std::exception& e){
         cerr << "Error: " << e.what() << endl;
         return false;
@@ -133,6 +130,6 @@ int main(int argc, const char** argv) {
     catch (...){
         cerr << "Unknown error!" << endl;
         return false;
-    }
+    }*/
     return 0;
 }

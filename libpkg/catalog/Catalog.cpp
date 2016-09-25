@@ -4,6 +4,7 @@
 //
 
 #include "Catalog.h"
+#include "CatalogError.h"
 #include <rapidjson/filereadstream.h>
 #include <catalog/parser/V1BaseHandler.h>
 #include <catalog/parser/V1DependencySummaryHandler.h>
@@ -49,16 +50,16 @@ void pkg::Catalog::upgrade_format(const std::string &newRoot) {
 }
 
 pkg::Catalog::Catalog(const std::string &root, const std::string &name, const bool &read_only, const bool &do_sign):
-    root_dir(root),
-    name(name),
-    read_only(read_only),
-    do_sign(do_sign)
+    root_dir{root},
+    name{name},
+    read_only{read_only},
+    do_sign{do_sign},
+    needs_upgrade{false}
 {
     //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
     // As the Catalog in pkg6 will always reside on disk a load is not required
     if(fs::is_regular_file(fs::system_complete((root_dir+"/catalog.attrs").c_str()))){
-        this->read_only = true;
-        this->needs_upgrade = true;
+        needs_upgrade = true;
     }
 }
 
@@ -112,6 +113,9 @@ void pkg::Catalog::savePackage(pkg::PackageInfo &pkg) {
 }
 
 void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
+    if(!fs::exists(statePath()+"/"+pkg.getFilePath())){
+        throw pkg::exception::PackageResolveException(pkg.getFmri());
+    }
     ifstream ifs(statePath()+"/"+pkg.getFilePath());
     IStreamWrapper isw(ifs);
     Document doc;
@@ -120,18 +124,39 @@ void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
 }
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
+    if(boost::starts_with(fmri, "pkg://")){
+        pkg::PackageInfo pkg(fmri);
+        loadPackage(pkg);
+        return pkg;
+    }
+    string s_path{boost::erase_first_copy(fmri, string("pkg:/"))};
     std::vector<std::string> found;
     for(auto entry = fs::recursive_directory_iterator(statePath().c_str(), fs::symlink_option::no_recurse); entry != fs::recursive_directory_iterator(); entry++){
-        if(boost::starts_with(entry->path().filename().string(), fmri)){
+        if(boost::contains(entry->path().string(), s_path)){
             found.push_back(entry->path().string());
         }
     }
+    if (found.size() == 0){
+        throw pkg::exception::PackageNotExistException(fmri);
+    }
     if(found.size() > 1){
+        //Initialize this string as fmri without version of first entry in found
+        string s_tmp_pkg_name{found[0].erase(found[0].find('@'), found[0].size())};
+        for(auto entry: found){
+            entry.erase(entry.find('@'), entry.size());
+            if(s_tmp_pkg_name != entry){
+                //If we have more than one fmri (version removed) than we can not resolve that partial fmri
+                throw pkg::exception::PackageResolveException(fmri + " to many possible candidates");
+            }
+        }
+        //TODO IPS version sorter
+        //Take newest package instead of first
         std::sort(found.begin(), found.end());
     }
+    //Then load Data to class.
     pkg::PackageInfo pkg("pkg://"+found[0]);
     loadPackage(pkg);
-    return pkg::PackageInfo();
+    return pkg;
 }
 
 std::vector<pkg::PackageInfo> pkg::Catalog::getPackages(const std::vector<std::string> &fmris) {

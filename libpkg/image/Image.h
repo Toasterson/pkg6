@@ -13,6 +13,8 @@
 #include "ImagePlan.h"
 
 namespace pkg {
+    static const std::string CATALOG_KNOWN{"known"};
+    static const std::string CATALOG_INSTALLED{"installed"};
     class Image {
         const std::string IMAGE_ROOT_PATH = "/var/pkg";
         /*
@@ -67,8 +69,6 @@ namespace pkg {
         void getNotInstalledDeps(const pkg::PackageInfo &pkg, pkg::ImagePlan &plan);
 
     public:
-        const std::string CATALOG_KNOWN = "known";
-        const std::string CATALOG_INSTALLED = "installed";
         //The absolute path of the image's location.
         std::string getImgRoot();
 
