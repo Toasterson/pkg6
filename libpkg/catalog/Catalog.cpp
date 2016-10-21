@@ -125,7 +125,7 @@ void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
     if(boost::starts_with(fmri, "pkg://")){
-        pkg::PackageInfo pkg(fmri);
+        pkg::PackageInfo pkg{fmri};
         loadPackage(pkg);
         return pkg;
     }

@@ -16,15 +16,13 @@ namespace pkg {
     class ImagePlan {
     private:
         vector<pkg::PackageInfo> packages;
-        string ROOT;
         string CACHE_ROOT;
         ImageConfig config;
         void getPackageMetadata();
     public:
 
-        ImagePlan(const string& root, const std::string& cache, const ImageConfig& config):ROOT{root},CACHE_ROOT{cache},config{config} {}
+        ImagePlan(const std::string& cache, const ImageConfig& config):CACHE_ROOT{cache},config{config} {}
         ImagePlan(const std::vector<pkg::PackageInfo> &packages, const string& root, const std::string& cache, const ImageConfig& config):
-                ROOT{root},
                 CACHE_ROOT{cache},
                 packages{packages},
                 config{config}

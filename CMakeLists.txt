@@ -44,6 +44,6 @@ add_executable(pkg_tests
 
         libpkg/image_tests/ImagePlanTest.cpp
         libpkg/image_tests/ImageConfigTest.cpp
-        libpkg/action_tests/FileActionTest.cpp)
+        libpkg/action_tests/FileActionTest.cpp libpkg/image_tests/ImageTest.cpp libpkg/catalog_tests/CatalogTest.cpp)
 target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
 add_test(AllTestInPKG6 pkg_tests)

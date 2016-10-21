@@ -45,7 +45,7 @@ namespace pkg {
          */
     private:
 
-        bool allow_ondisk_upgrade;
+        bool m_allow_ondisk_upgrade;
         bool blocking_locks;
         pkg::ImageConfig config;
         pkg::history::History history;

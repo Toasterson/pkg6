@@ -34,7 +34,7 @@ std::string pkg::Image::getArch() {
 
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     image_root{root},
-    allow_ondisk_upgrade(allow_ondisk_upgrade),
+    m_allow_ondisk_upgrade(allow_ondisk_upgrade),
     config(pkg::ImageConfig(root+"/"+IMAGE_ROOT_PATH)),
     history(pkg::history::History(root+"/"+IMAGE_ROOT_PATH+"/history")),
     installed(pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_INSTALLED)),

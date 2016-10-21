@@ -9,7 +9,7 @@
 namespace {
     class ImagePlanTest : public ::testing::Test {
     public:
-        ImagePlanTest():conf(), plan(conf, "./.tmp") {}
+        ImagePlanTest():conf(), plan("./.tmp", conf) {}
 
         virtual void SetUp() {
             conf.setPublisher("openindiana.org", pkg::Publisher("http://pkg.openindiana.org/hipster"));
