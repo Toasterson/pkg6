@@ -88,10 +88,8 @@ void pkg::Image::upgrade_format(std::string newRoot) {
     if(!fs::is_directory(fs::system_complete(newRoot))){
         fs::create_directories(fs::system_complete(newRoot));
     }
-    history.upgrade_format(newRoot);
-    config.upgrade_format(newRoot);
-    installed.upgrade_format(newRoot);
-    known.upgrade_format(newRoot);
+    //config.upgrade_format(newRoot);
+
     upgrade_needed = false;
 }
 

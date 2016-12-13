@@ -27,7 +27,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h
         libpkg/http_client/HTTPException.h libpkg/image/ImageException.h
         libpkg/publisher/Publisher.h
-        libpkg/action/FileAction.cpp libpkg/action/FileAction.h)
+        libpkg/action/FileAction.cpp libpkg/action/FileAction.h libpkg/interfaces/ICatalogStorage.h libpkg/catalog/PKG6CatalogStorage.cpp libpkg/interfaces/IRepository.h libpkg/interfaces/IImageConfigStorage.h libpkg/interfaces/IImageStorage.h libpkg/interfaces/IPackageStorage.h libpkg/interfaces/IPublisherStorage.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)
@@ -44,6 +44,6 @@ add_executable(pkg_tests
 
         libpkg/image_tests/ImagePlanTest.cpp
         libpkg/image_tests/ImageConfigTest.cpp
-        libpkg/action_tests/FileActionTest.cpp libpkg/image_tests/ImageTest.cpp libpkg/catalog_tests/CatalogTest.cpp)
+        libpkg/action_tests/FileActionTest.cpp libpkg/image_tests/ImageTest.cpp libpkg/catalog_tests/CatalogTest.cpp libpkg/catalog_tests/mock_ICatalogIO.h)
 target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
 add_test(AllTestInPKG6 pkg_tests)

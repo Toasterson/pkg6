@@ -14,6 +14,7 @@
 
 
 namespace pkg {
+    //TODO Refactor IO into Interface
     class ImageConfig {
     private:
         const std::string IMAGE_CONFIG_OLDFILENAME = "pkg5.image";

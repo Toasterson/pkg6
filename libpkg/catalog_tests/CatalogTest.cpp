@@ -4,52 +4,48 @@
 //
 
 #include <gtest/gtest.h>
+#include "gmock/gmock.h"
+#include "mock_ICatalogIO.h"
 #include <catalog/Catalog.h>
 
+using ::testing::Return;
+
 namespace {
-    class CatalogTest : public ::testing::Test {
-    public:
-        CatalogTest(): catalog{"/home/toast/workspace/illumos/ips/pkg5/state", "known"} {}
 
-        virtual void SetUp() {
+    TEST(CatalogTest, importLegacy){
+        MockICatalogIO mockICatalogIO("");
+        EXPECT_CALL(mockICatalogIO, createStatePath()).WillRepeatedly(Return(true));
+    }
 
-        }
-        pkg::Catalog catalog;
-    };
-
-    TEST_F(CatalogTest, UpgradeFormat){
+    TEST(CatalogTest, Create){
 
     }
 
-    TEST_F(CatalogTest, Create){
+    TEST(CatalogTest, ResolvePackage){
 
     }
 
-    TEST_F(CatalogTest, ResolvePackage){
+    TEST(CatalogTest, addPackage){
 
     }
 
-    TEST_F(CatalogTest, addPackage){
+    TEST(CatalogTest, UpdatePackage){
 
     }
 
-    TEST_F(CatalogTest, UpdatePackage){
+    TEST(CatalogTest, removePackage){
 
     }
 
-    TEST_F(CatalogTest, removePackage){
+    TEST(CatalogTest, savePackage){
 
     }
 
-    TEST_F(CatalogTest, savePackage){
+    TEST(CatalogTest, loadPackage){
 
     }
 
-    TEST_F(CatalogTest, loadPackage){
-
-    }
-
-    TEST_F(CatalogTest, containsPackage){
+    TEST(CatalogTest, containsPackage){
 
     }
 

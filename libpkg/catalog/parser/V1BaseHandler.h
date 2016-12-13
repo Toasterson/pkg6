@@ -15,6 +15,7 @@ using namespace std;
 using namespace rapidjson;
 
 namespace pkg {
+    //TODO Refactor to be more usefull for a PKG5 Catalog Storage Interface
     struct V1BaseHandler : public BaseReaderHandler<UTF8<>, V1BaseHandler> {
         V1BaseHandler(Catalog& catalog, Progress& progress) : state_(kExpectObjectStart), catalog(catalog), progress(progress) {}
 

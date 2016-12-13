@@ -68,7 +68,7 @@ void pkg::PackageInfo::addAction(const std::string &action_string) {
     }
 }
 
-pkg::PackageInfo pkg::PackageInfo::operator+=(pkg::PackageInfo &alternate) {
+pkg::PackageInfo pkg::PackageInfo::operator+=(const pkg::PackageInfo &alternate) {
     this->states += alternate.states;
     this->categories += alternate.categories;
     this->attrs += alternate.attrs;

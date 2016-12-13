@@ -13,6 +13,7 @@
 #include <Progress.h>
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
+#include <interfaces/ICatalogStorage.h>
 
 namespace pkg {
 
@@ -23,14 +24,12 @@ namespace pkg {
         bool do_sign;
         bool needs_upgrade;
         std::string signature;
-        std::string root_dir;
-        std::string name;
         std::tm last_modified;
+        ICatalogStorage interface;
 
     public:
 
-        Catalog(const std::string &root = "",
-                const std::string &name = "",
+        Catalog(const ICatalogStorage &iCatalogStorage,
                 const bool &read_only = false,
                 const bool &do_sign = false);
 
@@ -47,7 +46,7 @@ namespace pkg {
             return last_modified;
         }
 
-        void upgrade_format(const std::string &newRoot ="");
+        void upgrade_format(const ICatalogStorage &iCatalogStorage);
 
         void destroy();
 
@@ -72,8 +71,6 @@ namespace pkg {
         bool contains(const pkg::PackageInfo& pkg);
 
         bool contains(std::string fmri);
-
-        std::string statePath();
 
         bool needsUpgrade();
 

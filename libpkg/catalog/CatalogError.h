@@ -11,11 +11,12 @@
 
 namespace pkg{
     namespace exception{
+        //TODO Refactor to generic class with informative error message and information
         class PackageResolveException : public std::exception {
         private:
             std::string m_msg;
         public:
-            PackageResolveException(const std::string& pkg)
+            explicit PackageResolveException(const std::string& pkg)
                     : m_msg(std::string("cannot resolve ") + pkg)
             {}
             virtual const char *what() const throw() {
@@ -27,7 +28,7 @@ namespace pkg{
         private:
             std::string m_msg;
         public:
-            PackageNotExistException(const std::string& pkg)
+            explicit PackageNotExistException(const std::string& pkg)
                     : m_msg(pkg + std::string(" does not exist"))
             {}
             virtual const char *what() const throw() {
@@ -39,7 +40,7 @@ namespace pkg{
         private:
             std::string m_msg;
         public:
-            PackageLoadException(const std::string& pkg)
+            explicit PackageLoadException(const std::string& pkg)
                     : m_msg(std::string("can not load ")+pkg)
             {}
             virtual const char *what() const throw() {
@@ -51,7 +52,7 @@ namespace pkg{
         private:
             std::string m_msg;
         public:
-            PackageSaveException(const std::string& pkg)
+            explicit PackageSaveException(const std::string& pkg)
                     : m_msg(std::string("can not save ")+pkg)
             {}
             virtual const char *what() const throw() {

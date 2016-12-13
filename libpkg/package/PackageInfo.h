@@ -79,7 +79,7 @@ namespace pkg {
             return publisher + "/" + name + "@" + version;
         }
 
-        std::string getFilePath() {
+        std::string getFilePath() const {
             return getFmri() + ".json";
         }
 
@@ -93,7 +93,7 @@ namespace pkg {
 
         void markRenamed();
 
-        PackageInfo operator+=(PackageInfo& alternate);
+        PackageInfo operator+=(const PackageInfo& alternate);
 
         template <typename Writer>
         void Serialize(Writer& writer) const{

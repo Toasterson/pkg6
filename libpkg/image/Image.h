@@ -15,6 +15,7 @@
 namespace pkg {
     static const std::string CATALOG_KNOWN{"known"};
     static const std::string CATALOG_INSTALLED{"installed"};
+    //TODO Refactor IO into interface
     class Image {
         const std::string IMAGE_ROOT_PATH = "/var/pkg";
         /*
@@ -54,7 +55,6 @@ namespace pkg {
         int version;
         bool locked;
         std::string image_root;
-        void importpkg5();
         bool upgrade_needed;
 
 

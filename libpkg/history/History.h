@@ -60,7 +60,7 @@ namespace pkg {
         // Operations that are discarded, not saved, when recorded by history.
         const std::string DISCARDED_OPERATIONS[] = {"contents", "info", "list"};
 
-
+        //TODO Refactor into interface
         class History {
             /*
              * A History object is a representation of data about a pkg(5) client
