@@ -16,7 +16,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/image/ImageConfig.cpp libpkg/image/ImageConfig.cpp
         libpkg/Progress.h
         libpkg/manifest/Manifest.cpp libpkg/manifest/Manifest.h
-        libpkg/catalog/parser/V1BaseHandler.h libpkg/catalog/parser/V1DependencySummaryHandler.h
+        libpkg/catalog/handler/filestreamparser/V1BaseHandler.h libpkg/catalog/handler/filestreamparser/V1DependencySummaryHandler.h
         libpkg/action/AttributeAction.cpp libpkg/action/AttributeAction.h libpkg/action/ActionException.h
         libpkg/action/DependAction.cpp libpkg/action/DependAction.h
         libpkg/action/DirectoryAction.cpp libpkg/action/DirectoryAction.h
@@ -27,7 +27,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h
         libpkg/http_client/HTTPException.h libpkg/image/ImageException.h
         libpkg/publisher/Publisher.h
-        libpkg/action/FileAction.cpp libpkg/action/FileAction.h libpkg/interfaces/ICatalogStorage.h libpkg/catalog/PKG6CatalogStorage.cpp libpkg/interfaces/IRepository.h libpkg/interfaces/IImageConfigStorage.h libpkg/interfaces/IImageStorage.h libpkg/interfaces/IPackageStorage.h libpkg/interfaces/IPublisherStorage.h)
+        libpkg/action/FileAction.cpp libpkg/action/FileAction.h libpkg/interfaces/ICatalogStorage.h libpkg/catalog/handler/storage/V2CatalogStorage.cpp libpkg/interfaces/IRepositoryConsumer.h libpkg/interfaces/IImageConfigStorage.h libpkg/interfaces/IImageStorage.h libpkg/interfaces/IPackageStorage.h libpkg/interfaces/IPublisherStorage.h libpkg/catalog/handler/storage/V1CatalogStorage.cpp libpkg/interfaces/IHistoryStorage.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)

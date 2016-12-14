@@ -29,13 +29,18 @@ namespace pkg {
 
         explicit virtual ICatalogStorage(const string &root, const string &name) = 0;
 
-        virtual bool createStatePath() = 0;
+        //In Case any Filehandles etc. need to be opened. Used only Internally. But Public for use and Mocking
+        virtual FILE open() = 0;
 
-        virtual bool importLegacy(const string &file, const BaseReaderHandler &handler) = 0;
+        //Same as open
+        virtual bool close() = 0;
 
-        virtual int legacyPackageCount(const string &file) = 0;
+        //Create an empty Catalog
+        virtual bool create() = 0;
 
-        virtual bool isLegacy() = 0;
+        virtual int getPackageCount() = 0;
+
+        virtual int getPackageVersionCount() = 0;
 
         virtual bool packageExists(const string &fmri) = 0;
 
@@ -50,6 +55,8 @@ namespace pkg {
         virtual bool removePackage(const pkg::PackageInfo &pkg) = 0;
 
         virtual pkg::PackageInfo loadPackage(const string &fmri) = 0;
+
+        virtual bool transferPackages(ICatalogStorage &targetInterface) = 0;
     };
 }
 #endif //PKG6_ICATALOGACCESS_H

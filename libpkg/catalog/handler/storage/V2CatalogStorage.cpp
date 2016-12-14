@@ -4,14 +4,14 @@
 //
 
 #include <interfaces/ICatalogStorage.h>
-#include <catalog/parser/V1BaseHandler.h>
-#include <catalog/parser/V1DependencySummaryHandler.h>
+#include <catalog/handler/filestreamparser/V1BaseHandler.h>
+#include <catalog/handler/filestreamparser/V1DependencySummaryHandler.h>
 namespace pkg {
-    class PKG6CatalogStorage : public ICatalogStorage {
+    class V2CatalogStorage : public ICatalogStorage {
     private:
         string statePath;
     public:
-        explicit virtual PKG6CatalogStorage(const string &root, const string &name) :
+        explicit virtual V2CatalogStorage(const string &root, const string &name) :
                 ICatalogStorage(root, name), statePath{root+"/state/"+name} {}
 
         Document Parse(const ifstream &ifstream) {
@@ -32,39 +32,11 @@ namespace pkg {
             return true;
         }
 
-        virtual bool createStatePath() {
+        virtual bool create() {
             if (!fs::is_directory(fs::system_complete(statePath))) {
                 return fs::create_directories(fs::system_complete(statePath));
             }
             return false;
-        }
-
-        virtual bool importLegacy(const string &file, const BaseReaderHandler &handler) {
-            try {
-                // The json files from pkg5 are huge one needs to read it with a stream reader.
-                FILE *fp = fopen(file.c_str(), "r");
-                char readBuffer[65536];
-                FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-                Reader catalog_reader;
-                catalog_reader.Parse(is, handler);
-                fclose(fp);
-            } catch (...) {
-                return false;
-            }
-            return true;
-        }
-
-        int legacyPackageCount(const string &file) {
-            std::ifstream attrifstream((file).c_str());
-            IStreamWrapper isw(attrifstream);
-            Document catalog_attrs;
-            catalog_attrs.ParseStream(isw);
-            return catalog_attrs["package-version-count"].GetUint();
-        }
-
-
-        virtual bool isLegacy() {
-            return fs::is_regular_file(fs::system_complete((statePath + "/catalog.attrs").c_str()));
         }
 
         virtual bool packageExists(const string &fmri) {
@@ -154,14 +126,6 @@ namespace pkg {
             pkg::PackageInfo pkg;
             pkg.Deserialize(doc);
             return pkg;
-        }
-
-        virtual Document DownloadCatalogData(const string &url) {
-
-        }
-
-        virtual Document DownloadCatalogUpdateData(const string &url) {
-
         }
 
     };

@@ -5,32 +5,19 @@
 
 #include "Catalog.h"
 #include "CatalogError.h"
-#include <catalog/parser/V1BaseHandler.h>
-#include <catalog/parser/V1DependencySummaryHandler.h>
+#include <catalog/handler/filestreamparser/V1BaseHandler.h>
+#include <catalog/handler/filestreamparser/V1DependencySummaryHandler.h>
 
 
 namespace fs = boost::filesystem;
 using namespace rapidjson;
 
-void pkg::Catalog::upgrade_format(const ICatalogStorage &iCatalogStorage){
+void pkg::Catalog::upgrade_format(ICatalogStorage &newInterface){
     read_only = false;
     //TODO Error handling
-    //TODO Move Logic to Handle Format of PKG5 into own interface
-    interface.createStatePath();
-    int package_count = interface.legacyPackageCount(origin + "/catalog.attrs");
-    for (std::string json_file : {"/catalog.base.C", "/catalog.dependency.C", "/catalog.summary.C"}) {
-        Progress progress = Progress(
-                "importing pkg5 metadata from " + json_file,
-                "packages", package_count);
-        BaseReaderHandler handler;
-        if(json_file == "/catalog.base.C"){
-            handler = V1BaseHandler(*this, progress);
-        } else {
-            handler = V1DependencySummaryHandler(*this, progress);
-        }
-        //TODO Error handling
-        interface.importLegacy(origin+json_file, handler);
-    }
+
+    newInterface.create();
+
 }
 
 pkg::Catalog::Catalog(const ICatalogStorage &iCatalogStorage, const bool &read_only, const bool &do_sign):
