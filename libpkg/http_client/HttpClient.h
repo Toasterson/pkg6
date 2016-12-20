@@ -9,8 +9,8 @@
 #include <string>
 #include <map>
 #include <image/Image.h>
-#include <beast/include/beast/http.hpp>
-
+#include <beast/core.hpp>
+#include <beast/http.hpp>
 
 class HttpClient {
 private:
@@ -26,9 +26,9 @@ private:
 
     std::string url_encode(const std::string& value);
 
-    beast::http::response_v1<beast::http::string_body> makeStringHTTPRequest(const std::string &url);
+    beast::http::response<beast::http::string_body> makeStringHTTPRequest(const std::string &url);
 
-    beast::http::response_v1<beast::http::streambuf_body > makeStreamHTTPRequest(const std::string &url);
+    beast::http::response<beast::http::streambuf_body > makeStreamHTTPRequest(const std::string &url);
 
     /*
      * Actual REST functions called by the Public functions

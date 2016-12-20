@@ -20,15 +20,14 @@ void pkg::Catalog::upgrade_format(ICatalogStorage &newInterface){
 
 }
 
-pkg::Catalog::Catalog(const ICatalogStorage &iCatalogStorage, const bool &read_only, const bool &do_sign):
+pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_only, const bool &do_sign):
     read_only{read_only},
     do_sign{do_sign},
-    needs_upgrade{false},
-    interface(iCatalogStorage)
+    needs_upgrade{false}
 {
     //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
     // As the Catalog in pkg6 will always reside on disk a load is not required
-    needs_upgrade = interface.isLegacy();
+
 }
 
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {

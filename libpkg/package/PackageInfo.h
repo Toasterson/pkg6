@@ -18,6 +18,7 @@
 #include <action/DependAction.h>
 #include <action/DirectoryAction.h>
 #include <action/FileAction.h>
+#include <sstream>
 
 using namespace rapidjson;
 using namespace  pkg::action;
@@ -76,11 +77,18 @@ namespace pkg {
         }
 
         std::string getFmri() const {
-            return publisher + "/" + name + "@" + version;
+            return publisher + "/" + name + "@" + version + "," + build_release + "-" + branch + ":" + getTimeString();
         }
 
-        std::string getFilePath() const {
-            return getFmri() + ".json";
+        char getTimeString() const {
+            char strtime;
+            strftime(&strtime, 16, "%Y%m%dT%H%M%SZ", &packaging_date);
+            return strtime;
+        }
+
+        void setPackagingDate(const string &datestring){
+            stringstream ss(datestring);
+            ss >> std::get_time(&packaging_date, "%Y%m%dT%H%M%SZ");
         }
 
         void setFmri(const std::string& fmri);
@@ -104,6 +112,12 @@ namespace pkg {
             writer.String(name.c_str());
             writer.String("version");
             writer.String(version.c_str());
+            writer.String("build");
+            writer.String(build_release.c_str());
+            writer.String("branch");
+            writer.String(branch.c_str());
+            writer.String("packaging_date");
+            writer.String(getTimeString());
             if(!signature.empty()) {
                 writer.String("signature");
                 writer.String(signature.c_str());
@@ -157,6 +171,9 @@ namespace pkg {
                 this->publisher = rootValue["publisher"].GetString();
                 this->name = rootValue["name"].GetString();
                 this->version = rootValue["version"].GetString();
+                this->build_release = rootValue["build"].GetString();
+                this->branch = rootValue["branch"].GetString();
+                setPackagingDate(rootValue["packaging_date"].GetString());
                 if(rootValue.HasMember("signature")) {
                     this->signature = rootValue["signature"].GetString();
                 }

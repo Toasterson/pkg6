@@ -9,6 +9,8 @@
 #include <action/DirectoryAction.h>
 #include <vectoradd.h>
 #include <action/ActionException.h>
+#include <sstream>
+#include <iomanip>
 
 using namespace rapidjson;
 
@@ -90,6 +92,10 @@ pkg::PackageInfo pkg::PackageInfo::operator+=(const pkg::PackageInfo &alternate)
     }
     this->renamed = alternate.renamed;
     this->obsolete = alternate.obsolete;
+    this->version = alternate.version;
+    this->build_release = alternate.build_release;
+    this->branch = alternate.branch;
+    this->packaging_date = alternate.packaging_date;
 
     return *this;
 }
@@ -104,8 +110,13 @@ void pkg::PackageInfo::setFmri(const std::string &fmri) {
     fmritmp.erase(0, fmritmp.find("/"));
     name = fmritmp.substr(0, fmritmp.find("@"));
     fmritmp.erase(0, fmritmp.find("@"));
-    //TODO parse version into pieces
-    version = fmritmp;
+    version = fmritmp.substr(0, fmritmp.find(","));
+    fmritmp.erase(0, fmritmp.find(","));
+    build_release = fmritmp.substr(0, fmritmp.find("-"));
+    fmritmp.erase(0, fmritmp.find("-"));
+    branch = fmritmp.substr(0, fmritmp.find(":"));
+    fmritmp.erase(0, fmritmp.find(":"));
+    setPackagingDate(fmritmp);
 }
 
 void pkg::PackageInfo::markObsolete() {

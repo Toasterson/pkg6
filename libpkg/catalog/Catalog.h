@@ -26,12 +26,16 @@ namespace pkg {
         std::string signature;
         std::tm last_modified;
         ICatalogStorage interface;
-
+        string root;
+        string name;
     public:
 
-        Catalog(const ICatalogStorage &iCatalogStorage,
+        Catalog(const string &root,
+                const string &name,
                 const bool &read_only = false,
                 const bool &do_sign = false);
+
+        void upgrade_format(ICatalogStorage &newInterface);
 
 
         bool isRead_only() const {

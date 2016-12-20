@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 project(pkg6)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories(lib libpkg lib/beast/include)
+include_directories(lib libpkg)
 link_directories(/usr/local/lib)
 set(LIBPKG_SOURCE_FILES
         libpkg/image/Image.cpp libpkg/image/Image.h

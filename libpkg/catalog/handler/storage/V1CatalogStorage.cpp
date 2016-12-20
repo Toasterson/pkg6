@@ -63,6 +63,7 @@ namespace pkg{
             return true;
         }
     public:
+        V1CatalogStorage(){}
         V1CatalogStorage(const string &root, const string &name) : ICatalogStorage(root, name), statePath{root+"/state/"+name} {}
 
         virtual FILE open() = 0;

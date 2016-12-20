@@ -8,7 +8,6 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <string>
-#include <beast/include/beast/http.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -17,7 +16,7 @@ using namespace boost::asio;
 using namespace beast;
 
 void HttpClient::getVersion_0() {
-    http::response_v1<beast::http::string_body> resp = makeStringHTTPRequest(base_path + "/versions/0");
+    http::response<beast::http::string_body> resp = makeStringHTTPRequest(base_path + "/versions/0");
     string body = resp.body;
     vector<string> v_body;
     boost::split(v_body, body, boost::is_any_of("\n"));
@@ -78,44 +77,44 @@ std::string HttpClient::url_encode(const std::string &value) {
     return escaped.str();
 }
 
-beast::http::response_v1<http::string_body> HttpClient::makeStringHTTPRequest(const std::string &url) {
+beast::http::response<http::string_body> HttpClient::makeStringHTTPRequest(const std::string &url) {
     io_service ios;
     ip::tcp::resolver r{ios};
     ip::tcp::socket sock{ios};
     connect(sock, r.resolve(ip::tcp::resolver::query{host, protocol}));
-    http::request_v1<beast::http::empty_body> request;
+    http::request<beast::http::empty_body> request;
     request.method = "GET";
     request.url = url;
     request.version = 11;
-    request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
-    request.headers.replace("User-Agent", USER_AGENT);
+    request.fields.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
+    request.fields.replace("User-Agent", USER_AGENT);
     http::prepare(request);
     http::write(sock, request);
 
     // Receive HTTP response using beast
     beast::streambuf sb;
-    http::response_v1<beast::http::string_body> resp;
+    http::response<beast::http::string_body> resp;
     http::read(sock, sb, resp);
     return resp;
 }
 
-beast::http::response_v1<beast::http::streambuf_body> HttpClient::makeStreamHTTPRequest(const std::string &url) {
+beast::http::response<beast::http::streambuf_body> HttpClient::makeStreamHTTPRequest(const std::string &url) {
     io_service ios;
     ip::tcp::resolver r{ios};
     ip::tcp::socket sock{ios};
     connect(sock, r.resolve(ip::tcp::resolver::query{host, protocol}));
-    http::request_v1<beast::http::empty_body> request;
+    http::request<beast::http::empty_body> request;
     request.method = "GET";
     request.url = url;
     request.version = 11;
-    request.headers.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
-    request.headers.replace("User-Agent", USER_AGENT);
+    request.fields.replace("Host", host + ":" + std::to_string(sock.remote_endpoint().port()));
+    request.fields.replace("User-Agent", USER_AGENT);
     http::prepare(request);
     http::write(sock, request);
 
     // Receive HTTP response using beast
     beast::streambuf sb;
-    http::response_v1<beast::http::streambuf_body> resp;
+    http::response<beast::http::streambuf_body> resp;
     http::read(sock, sb, resp);
     return resp;
 }

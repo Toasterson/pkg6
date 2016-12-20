@@ -37,8 +37,8 @@ pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     m_allow_ondisk_upgrade(allow_ondisk_upgrade),
     config(pkg::ImageConfig(root+"/"+IMAGE_ROOT_PATH)),
     history(pkg::history::History(root+"/"+IMAGE_ROOT_PATH+"/history")),
-    installed(pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_INSTALLED)),
-    known(pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_KNOWN)),
+    installed{pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_INSTALLED)},
+    known{pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_KNOWN)},
     locked{false},
     blocking_locks{false},
     version{6},
@@ -99,7 +99,7 @@ bool pkg::Image::needsUpgrade() {
 
 pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
     std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
-    pkg::ImagePlan plan(getImgRoot(), getWriteCachePath(), config);
+    pkg::ImagePlan plan(resolved, getImgRoot(), getWriteCachePath(), config);
     for(auto pkg : resolved){
         if(!installed.contains(pkg) and !plan.contains(pkg)){
             getNotInstalledDeps(pkg, plan);

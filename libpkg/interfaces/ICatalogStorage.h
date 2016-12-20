@@ -26,8 +26,8 @@ namespace pkg {
     class ICatalogStorage {
     public:
         virtual ~ICatalogStorage() {}
-
-        explicit virtual ICatalogStorage(const string &root, const string &name) = 0;
+        ICatalogStorage(){}
+        explicit ICatalogStorage(const string &root, const string &name){}
 
         //In Case any Filehandles etc. need to be opened. Used only Internally. But Public for use and Mocking
         virtual FILE open() = 0;

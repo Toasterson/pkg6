@@ -6,31 +6,31 @@
 #include <interfaces/ICatalogStorage.h>
 #include <catalog/handler/filestreamparser/V1BaseHandler.h>
 #include <catalog/handler/filestreamparser/V1DependencySummaryHandler.h>
+#include <ctime>
+
 namespace pkg {
     class V2CatalogStorage : public ICatalogStorage {
     private:
         string statePath;
+
+        string filePath(const pkg::PackageInfo &pkg) const {
+            return statePath + "/" + pkg.publisher + "/" + pkg.name + ".json";
+        }
+
+        fs::path pkg_directory(const pkg::PackageInfo &pkg) const {
+            return fs::system_complete(filePath(pkg)).parent_path();
+        }
+
+        string FMRIVersionPart(const pkg::PackageInfo &pkg) const {
+            char strtime[16];
+            strftime(&strtime, 16, "%Y%m%dT%H%M%SZ", &pkg.packaging_date);
+            return pkg.version + "," + pkg.build_release + "-" + pkg.branch + ":" + strtime;
+        }
+
     public:
-        explicit virtual V2CatalogStorage(const string &root, const string &name) :
+        V2CatalogStorage(){}
+        explicit V2CatalogStorage(const string &root, const string &name) :
                 ICatalogStorage(root, name), statePath{root+"/state/"+name} {}
-
-        Document Parse(const ifstream &ifstream) {
-            IStreamWrapper isw(ifstream);
-            Document doc;
-            doc.ParseStream(isw);
-            return doc;
-        }
-
-        bool Write(const ofstream &stream, const pkg::PackageInfo &pkg) {
-            try {
-                OStreamWrapper osw(stream);
-                Writer<OStreamWrapper> writer(osw);
-                pkg.Serialize(writer);
-            } catch (...) {
-                return false;
-            }
-            return true;
-        }
 
         virtual bool create() {
             if (!fs::is_directory(fs::system_complete(statePath))) {
@@ -62,10 +62,12 @@ namespace pkg {
         virtual bool addPackage(const pkg::PackageInfo &pkg) {
             try {
                 //Write Directory Structure of Package if does not exist
-                fs::path pkg_path = fs::system_complete((statePath + "/" + pkg.getFilePath()).c_str()).parent_path();
+                fs::path pkg_path = pkg_directory(pkg);
                 if (!fs::is_directory(pkg_path)) {
                     fs::create_directories(pkg_path);
+
                 }
+                //Then save the Contents of Packge
                 savePackage(pkg);
             } catch (...) {
                 return false;
@@ -75,13 +77,29 @@ namespace pkg {
 
         virtual bool savePackage(const pkg::PackageInfo &pkg) {
             //Save Package to disk as one json per package
-            return Write(ofstream(statePath + "/" + pkg.getFilePath()), pkg);
+            try {
+                Document doc;
+                ifstream ifs(filePath(pkg));
+                IStreamWrapper isw(ifs);
+                doc.ParseStream(isw);
+                ifs.close();
+                GenericValue val;
+                pkg.Serialize(val);
+                doc[FMRIVersionPart(pkg).c_str()] = val;
+                ofstream ofs(filePath(pkg));
+                OStreamWrapper osw(ofs);
+                Writer<OStreamWrapper> fileWriter;
+                doc.Accept(fileWriter);
+            } catch (...){
+                return false;
+            }
+            return true;
         }
 
         virtual bool updatePackage(const pkg::PackageInfo &updatePkg) {
             try {
                 //Load from disk
-                pkg::PackageInfo pkg = loadPackage(updatePkg.getFilePath());
+                pkg::PackageInfo pkg = loadPackage(updatePkg.getFmri());
                 //Use += to merge with second pkg instance overwriting first
                 pkg += updatePkg;
                 //Save New Package data
@@ -94,8 +112,7 @@ namespace pkg {
 
         virtual bool addOrUpdatePackage(const pkg::PackageInfo &pkg) {
             try {
-                if (fs::is_directory(
-                        fs::system_complete((statePath + "/" + pkg.getFilePath()).c_str()).parent_path())) {
+                if (packageExists(pkg.getFmri())){
                     updatePackage(pkg);
                 } else {
                     addPackage(pkg);
@@ -108,10 +125,16 @@ namespace pkg {
 
         virtual bool removePackage(const pkg::PackageInfo &pkg) {
             try {
-                fs::path pkg_path = fs::system_complete((statePath + "/" + pkg.getFilePath()).c_str()).parent_path();
-                if (fs::is_directory(pkg_path)) {
-                    fs::remove_all(pkg_path);
-                }
+                Document doc;
+                ifstream ifs(filePath(pkg));
+                IStreamWrapper isw(ifs);
+                doc.ParseStream(isw);
+                ifs.close();
+                doc.EraseMember(FMRIVersionPart(pkg).c_str());
+                ofstream ofs(filePath(pkg));
+                OStreamWrapper osw(ofs);
+                Writer<OStreamWrapper> fileWriter;
+                doc.Accept(fileWriter);
             } catch (...) {
                 return false;
             }
@@ -119,12 +142,13 @@ namespace pkg {
         }
 
         virtual pkg::PackageInfo loadPackage(const string fmri) {
-            ifstream ifs(statePath + "/" + fmri + ".json");
+            pkg::PackageInfo pkg;
+            ifstream ifs(filePath(pkg));
             IStreamWrapper isw(ifs);
             Document doc;
             doc.ParseStream(isw);
-            pkg::PackageInfo pkg;
-            pkg.Deserialize(doc);
+            ifs.close();
+            pkg.Deserialize(doc[FMRIVersionPart(pkg).c_str()]);
             return pkg;
         }
 
