@@ -3,114 +3,124 @@
 // for License see LICENSE file in root of repository
 //
 
-#include <interfaces/ICatalogStorage.h>
-#include <Progress.h>
+#include <catalog/handler/storage/V1CatalogStorage.h>
 #include <catalog/handler/filestreamparser/V1BaseHandler.h>
 #include <catalog/handler/filestreamparser/V1DependencySummaryHandler.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/filereadstream.h>
+#include <fstream>
+#include <boost/filesystem.hpp>
 
-namespace pkg{
-    class V1CatalogStorage : public ICatalogStorage{
-    private:
-        string statePath;
-        string getAttrFilePath(){
-            return statePath + "/catalog.attrs";
-        }
-        string getBaseFilePath(){
-            return statePath + "/catalog.base.C";
-        }
-        string getDependencyFilePath(){
-            return statePath + "/catalog.dependency.C";
-        }
-        string getSummaryFilePath(){
-            return statePath + "/catalog.summary.C";
-        }
-        pkg::PackageInfo streamLoadPackage(const string &fmri){
+namespace fs = boost::filesystem;
 
-        }
-        int getFileSize(){
+pkg::PackageInfo pkg::V1CatalogStorage::streamLoadPackage(const string &fmri) {
+    return pkg::PackageInfo();
+}
 
-        }
-        bool streamTransferPackages(ICatalogStorage &targetInterface){
-            try {
-                for (std::string json_file : {"/catalog.base.C", "/catalog.dependency.C", "/catalog.summary.C"}) {
-                    Progress progress = Progress(
-                            "importing pkg5 metadata from " + json_file,
-                            "packages", getPackageVersionCount());
-                    BaseReaderHandler handler;
-                    if (json_file == "/catalog.base.C") {
-                        handler = V1BaseHandler(*this, progress);
-                    } else {
-                        handler = V1DependencySummaryHandler(*this, progress);
-                    }
-                    // The json files from pkg5 are huge one needs to read it with a stream reader.
-                    string file = statePath + json_file;
-                    FILE *fp = fopen(file.c_str(), "r");
-                    char readBuffer[65536];
-                    FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-                    Reader catalog_reader;
-                    catalog_reader.Parse(is, handler);
-                    fclose(fp);
-                }
-            } catch (...) {
-                return false;
+int pkg::V1CatalogStorage::getFileSize() {
+    return 0;
+}
+
+bool pkg::V1CatalogStorage::streamTransferPackages(pkg::ICatalogStorage &targetInterface) {
+    try {
+        for (std::string json_file : {"/catalog.base.C", "/catalog.dependency.C", "/catalog.summary.C"}) {
+            Progress progress = Progress(
+                    "importing pkg5 metadata from " + json_file,
+                    "packages", getPackageVersionCount());
+
+            if (json_file == "/catalog.base.C") {
+
+            } else {
+
             }
-            return true;
+            // The json files from pkg5 are huge one needs to read it with a stream reader.
+            string file = statePath + json_file;
+            FILE *fp = fopen(file.c_str(), "r");
+            char readBuffer[65536];
+            FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+            Reader catalog_reader;
+            //TODO Re hook up Catalog FileHandler
+            //catalog_reader.Parse(is, handler);
+            fclose(fp);
         }
-        bool streamPackageExists(const string &fmri){
+    } catch (...) {
+        return false;
+    }
+    return true;
+}
 
-        }
-        bool useStreamApproach(){
-            return true;
-        }
-    public:
-        V1CatalogStorage(){}
-        V1CatalogStorage(const string &root, const string &name) : ICatalogStorage(root, name), statePath{root+"/state/"+name} {}
+bool pkg::V1CatalogStorage::streamPackageExists(const string &fmri) {
+    return false;
+}
 
-        virtual FILE open() = 0;
+bool pkg::V1CatalogStorage::useStreamApproach() {
+    return true;
+}
 
-        virtual bool close() = 0;
+bool pkg::V1CatalogStorage::does_apply() {
+    return fs::exists((statePath + "/catalog.attrs").c_str());
+}
 
-        virtual bool create() = 0;
+int pkg::V1CatalogStorage::getPackageCount() {
+    std::ifstream attrifstream(getAttrFilePath().c_str());
+    IStreamWrapper isw(attrifstream);
+    Document catalog_attrs;
+    catalog_attrs.ParseStream(isw);
+    return catalog_attrs["package-count"].GetUint();
+}
 
-        virtual int getPackageCount(){
-            std::ifstream attrifstream(getAttrFilePath().c_str());
-            IStreamWrapper isw(attrifstream);
-            Document catalog_attrs;
-            catalog_attrs.ParseStream(isw);
-            return catalog_attrs["package-count"].GetUint();
-        }
+int pkg::V1CatalogStorage::getPackageVersionCount() {
+    std::ifstream attrifstream(getAttrFilePath().c_str());
+    IStreamWrapper isw(attrifstream);
+    Document catalog_attrs;
+    catalog_attrs.ParseStream(isw);
+    return catalog_attrs["package-version-count"].GetUint();
+}
 
-        virtual int getPackageVersionCount(){
-            std::ifstream attrifstream(getAttrFilePath().c_str());
-            IStreamWrapper isw(attrifstream);
-            Document catalog_attrs;
-            catalog_attrs.ParseStream(isw);
-            return catalog_attrs["package-version-count"].GetUint();
-        }
+bool pkg::V1CatalogStorage::transferPackages(pkg::ICatalogStorage &targetInterface) {
+    //Checkfilesize if above 20MB use FileStream Approach
+    if(useStreamApproach()){
+        return streamTransferPackages(targetInterface);
+    }
+    return false;
+}
 
-        virtual bool packageExists(const string &fmri) = 0;
+pkg::PackageInfo pkg::V1CatalogStorage::loadPackage(const string &fmri) {
+    return pkg::PackageInfo();
+}
 
-        virtual bool addPackage(const pkg::PackageInfo &pkg) = 0;
+bool pkg::V1CatalogStorage::removePackage(const pkg::PackageInfo &pkg) {
+    return false;
+}
 
-        virtual bool savePackage(const pkg::PackageInfo &pkg) = 0;
+bool pkg::V1CatalogStorage::addOrUpdatePackage(const pkg::PackageInfo &pkg) {
+    return false;
+}
 
-        virtual bool updatePackage(const pkg::PackageInfo &updatePkg) = 0;
+bool pkg::V1CatalogStorage::updatePackage(const pkg::PackageInfo &updatePkg) {
+    return false;
+}
 
-        virtual bool addOrUpdatePackage(const pkg::PackageInfo &pkg) = 0;
+bool pkg::V1CatalogStorage::savePackage(const pkg::PackageInfo &pkg) {
+    return false;
+}
 
-        virtual bool removePackage(const pkg::PackageInfo &pkg) = 0;
+bool pkg::V1CatalogStorage::addPackage(const pkg::PackageInfo &pkg) {
+    return false;
+}
 
-        virtual pkg::PackageInfo loadPackage(const string &fmri){
+bool pkg::V1CatalogStorage::packageExists(const string &fmri) {
+    return false;
+}
 
-        }
+FILE pkg::V1CatalogStorage::open() {
+    return FILE();
+}
 
-        virtual bool transferPackages(ICatalogStorage &targetInterface){
-            //Checkfilesize if above 20MB use FileStream Approach
-            if(useStreamApproach()){
-                return streamTransferPackages(targetInterface);
-            }
-            return false;
-        }
+bool pkg::V1CatalogStorage::close() {
+    return false;
+}
 
-    };
+bool pkg::V1CatalogStorage::create() {
+    return false;
 }

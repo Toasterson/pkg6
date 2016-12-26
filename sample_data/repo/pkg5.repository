@@ -1,0 +1,12 @@
+[publisher]
+prefix = userland
+
+[repository]
+trust-anchor-directory = /etc/certs/CA/
+version = 4
+check-certificate-revocation = False
+signature-required-names = []
+
+[CONFIGURATION]
+version = 4
+

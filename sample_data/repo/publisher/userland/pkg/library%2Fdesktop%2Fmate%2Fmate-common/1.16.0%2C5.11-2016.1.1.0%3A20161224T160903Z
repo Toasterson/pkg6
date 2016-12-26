@@ -1,0 +1,24 @@
+set name=pkg.fmri value=pkg://userland/library/desktop/mate/mate-common@1.16.0,5.11-2016.1.1.0:20161224T160903Z
+set name=userland.info.git-remote value=https://github.com/toasterson/oi-userland
+set name=com.oracle.info.name value=mate-common
+set name=userland.info.git-branch value=oi/hipster
+set name=userland.info.git-rev value=084011e1dd452a12a218ecd447b7a1ccd48c897a
+set name=pkg.summary value="Common automake macros for MATE"
+set name=info.classification value=org.opensolaris.category.2008:System/Libraries
+set name=info.upstream-url value=http://www.mate-desktop.org
+set name=info.source-url value=http://pub.mate-desktop.org/releases/1.16/mate-common-1.16.0.tar.xz
+set name=org.opensolaris.consolidation value=userland
+set name=com.oracle.info.version value=1.16.0
+set name=variant.arch value=i386
+file db98339f55b9829e09f2b5c7e9281718f8442842 chash=d84d0f93f417767aa678e8eef9cb64c5e44c7d9f facet.devel=all group=bin mode=0444 owner=root path=usr/share/aclocal/mate-code-coverage.m4 pkg.csize=2343 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=6826
+file 32fa27e4ab3806cc5ff461e4963eb53b8558d318 chash=cbdb0f93a44f5752bb3c8f54bb0d7215771498fc facet.devel=all group=bin mode=0444 owner=root path=usr/share/aclocal/mate-common.m4 pkg.csize=1035 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=2048
+file b3f936a54e16d058979d46ff4b0bf615bf817b88 chash=e3ace6af51ab7f9b98db5210db6fcc2a6e7c1d1e group=bin mode=0555 owner=root path=usr/bin/mate-autogen pkg.csize=4268 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=13096
+file f546ff2c57d95232ddbaab169a2bf3de698cbdf3 chash=cb29dafd964a30ee0218f2859bbe9cce0e2078a8 group=bin mode=0555 owner=root path=usr/bin/mate-doc-common pkg.csize=440 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=963
+file 9a115bf8bd55e4cafd44656c3344e73321183bc5 chash=c8908705174308cafaaf64d82bca6bccac130599 facet.devel=all group=bin mode=0444 owner=root path=usr/share/aclocal/mate-compiler-flags.m4 pkg.csize=1618 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=4767
+file 447b9f80f96c64d58b01aa9e6f496109d0c0f402 chash=095cd887f6cd2008660343636c2e7cc21c962825 facet.doc.man=all group=bin mode=0444 owner=root path=usr/share/man/man1/mate-autogen.1 pkg.csize=714 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=1336
+file 4146b341d70e6005501f4bd6fb1ba8d3acfdf87d chash=566c4d3773afdee59249fc793ab1335e63daecdb facet.doc.man=all group=bin mode=0444 owner=root path=usr/share/man/man1/mate-doc-common.1 pkg.csize=953 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=1811
+file 6cfedb7e74f773c9386b5fd1d4cdfee9b42b455e chash=4030ad29b1306e851cab9bf503e524f050d5c8cc group=bin mode=0444 owner=root path=usr/share/mate-common/data/omf.make pkg.csize=1027 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=2417
+file 00d094b09cff97e86865c2b95ee20fd7bc30338e chash=3b906ad705eff988577258bc6de5b3188c948cce group=bin mode=0444 owner=root path=usr/share/mate-common/data/xmldocs.make pkg.csize=1222 pkg.depend.bypass-generate=usr/lib(.*)/libpq.so.* pkg.depend.bypass-generate=usr/lib(.*)/libruby.so.* pkg.size=3179
+license 4097e0c884062c6fe7c94d0753f7446517c03ecf chash=17c0bb0599a02bfcfad05ecc9c6250aa9cdf513d license="GPLv2, LGPLv2, FDLv1.1" pkg.csize=16620 pkg.size=61765
+depend fmri=pkg:/SUNWcs@0.5.11-2016.1.1.16068 type=require
+depend fmri=pkg:/shell/bash@4.3.46-2016.0.0.0 type=require

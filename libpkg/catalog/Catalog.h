@@ -14,6 +14,8 @@
 #define BOOST_SYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
 #include <interfaces/ICatalogStorage.h>
+#include <catalog/handler/storage/V2CatalogStorage.h>
+#include <catalog/handler/storage/V1CatalogStorage.h>
 
 namespace pkg {
 
@@ -25,7 +27,8 @@ namespace pkg {
         bool needs_upgrade;
         std::string signature;
         std::tm last_modified;
-        ICatalogStorage interface;
+        V1CatalogStorage v1interface;
+        V2CatalogStorage v2interface;
         string root;
         string name;
     public:
@@ -35,7 +38,7 @@ namespace pkg {
                 const bool &read_only = false,
                 const bool &do_sign = false);
 
-        void upgrade_format(ICatalogStorage &newInterface);
+        void upgrade_format();
 
 
         bool isRead_only() const {
@@ -82,4 +85,4 @@ namespace pkg {
 };
 
 
-#endif //PKG6_CATALOGPARTBASE_H
+#endif //PKG6_CATALOG_H

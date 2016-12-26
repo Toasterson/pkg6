@@ -13,7 +13,7 @@ namespace {
 
         virtual void SetUp() {
             conf.setPublisher("openindiana.org", pkg::Publisher("http://pkg.openindiana.org/hipster"));
-            plan.add(pkg::PackageInfo("openindiana.org", "web/server/nginx", "1.11.3,5.11-2016.0.0.0:20160730T022405Z"));
+            plan.add(pkg::PackageInfo("pkg://openindiana.org/web/server/nginx@1.11.3,5.11-2016.0.0.0:20160730T022405Z"));
         }
         pkg::ImageConfig conf;
         pkg::ImagePlan plan;

@@ -71,32 +71,33 @@ void pkg::PackageInfo::addAction(const std::string &action_string) {
 }
 
 pkg::PackageInfo pkg::PackageInfo::operator+=(const pkg::PackageInfo &alternate) {
-    this->states += alternate.states;
-    this->categories += alternate.categories;
-    this->attrs += alternate.attrs;
-    this->classification += alternate.classification;
-    this->dirs += alternate.dirs;
-    this->dependencies += alternate.dependencies;
-    this->files += alternate.files;
-    this->licenses += alternate.licenses;
-    this->links += alternate.links;
+    if(this->getFmri() == alternate.getFmri()) {
+        this->states += alternate.states;
+        this->categories += alternate.categories;
+        this->attrs += alternate.attrs;
+        this->classification += alternate.classification;
+        this->dirs += alternate.dirs;
+        this->dependencies += alternate.dependencies;
+        this->files += alternate.files;
+        this->licenses += alternate.licenses;
+        this->links += alternate.links;
 
-    if(!alternate.description.empty()) {
-        this->description = alternate.description;
+        if (!alternate.description.empty()) {
+            this->description = alternate.description;
+        }
+        if (!alternate.summary.empty()) {
+            this->summary = alternate.summary;
+        }
+        if (!alternate.humanversion.empty()) {
+            this->humanversion = alternate.humanversion;
+        }
+        this->renamed = alternate.renamed;
+        this->obsolete = alternate.obsolete;
+        this->version = alternate.version;
+        this->build_release = alternate.build_release;
+        this->branch = alternate.branch;
+        this->packaging_date = alternate.packaging_date;
     }
-    if(!alternate.summary.empty()) {
-        this->summary = alternate.summary;
-    }
-    if(!alternate.humanversion.empty()){
-        this->humanversion = alternate.humanversion;
-    }
-    this->renamed = alternate.renamed;
-    this->obsolete = alternate.obsolete;
-    this->version = alternate.version;
-    this->build_release = alternate.build_release;
-    this->branch = alternate.branch;
-    this->packaging_date = alternate.packaging_date;
-
     return *this;
 }
 
@@ -107,15 +108,15 @@ void pkg::PackageInfo::setFmri(const std::string &fmri) {
     }
     std::string fmritmp = boost::erase_first_copy(fmri, "pkg://");
     publisher = fmritmp.substr(0, fmritmp.find("/"));
-    fmritmp.erase(0, fmritmp.find("/"));
+    fmritmp.erase(0, fmritmp.find("/")+1);
     name = fmritmp.substr(0, fmritmp.find("@"));
-    fmritmp.erase(0, fmritmp.find("@"));
+    fmritmp.erase(0, fmritmp.find("@")+1);
     version = fmritmp.substr(0, fmritmp.find(","));
-    fmritmp.erase(0, fmritmp.find(","));
+    fmritmp.erase(0, fmritmp.find(",")+1);
     build_release = fmritmp.substr(0, fmritmp.find("-"));
-    fmritmp.erase(0, fmritmp.find("-"));
+    fmritmp.erase(0, fmritmp.find("-")+1);
     branch = fmritmp.substr(0, fmritmp.find(":"));
-    fmritmp.erase(0, fmritmp.find(":"));
+    fmritmp.erase(0, fmritmp.find(":")+1);
     setPackagingDate(fmritmp);
 }
 

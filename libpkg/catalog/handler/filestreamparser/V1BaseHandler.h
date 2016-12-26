@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <catalog/Catalog.h>
+#include <catalog/handler/storage/V1CatalogStorage.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -17,9 +17,9 @@ using namespace rapidjson;
 namespace pkg {
     //TODO Refactor to be more usefull for a PKG5 Catalog Storage Interface
     struct V1BaseHandler : public BaseReaderHandler<UTF8<>, V1BaseHandler> {
-        V1BaseHandler(Catalog& catalog, Progress& progress) : state_(kExpectObjectStart), catalog(catalog), progress(progress) {}
+        V1BaseHandler(V1CatalogStorage& catalogStorage, Progress& progress) : state_(kExpectObjectStart), catalogStorage(catalogStorage), progress(progress) {}
 
-        Catalog catalog;
+        V1CatalogStorage catalogStorage;
 
         Progress progress;
 
@@ -120,7 +120,7 @@ namespace pkg {
                     state_ = kExpectPackageVersionObjectEndOrNext;
                     return true;
                 case kExpectPackageVersionObjectEndOrNext:
-                    catalog.addOrUpdatePackage(package_);
+                    catalogStorage.addOrUpdatePackage(package_);
                     progress++;
                     package_ = PackageInfo();
                     return true;

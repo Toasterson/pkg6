@@ -19,6 +19,7 @@
 #include <action/DirectoryAction.h>
 #include <action/FileAction.h>
 #include <sstream>
+#include <iomanip>
 
 using namespace rapidjson;
 using namespace  pkg::action;
@@ -70,25 +71,42 @@ namespace pkg {
         std::vector<FileAction> files;
 
         PackageInfo(){}
-        PackageInfo(const std::string& publisher, const std::string& name, const std::string& version): publisher(publisher), name(name), version(version){}
-        PackageInfo(const PackageInfo& origin): publisher(origin.publisher), name(origin.name), version(origin.version){}
+        PackageInfo(const std::string& publisher, const std::string& name, const std::string& version, const std::string& branch, const std::string& build, const std::string& packaging_date):
+                publisher{publisher},
+                name{name},
+                version{version},
+                build_release{build},
+                branch{branch}
+        {
+            setPackagingDate(packaging_date);
+        }
+        PackageInfo(const PackageInfo& origin):
+                publisher{origin.publisher},
+                name{origin.name},
+                version{origin.version},
+                branch{origin.branch},
+                build_release{origin.build_release}
+        {
+            setPackagingDate(origin.getPackagingDate());
+        }
         PackageInfo(const std::string& FMRI){
             setFmri(FMRI);
         }
 
         std::string getFmri() const {
-            return publisher + "/" + name + "@" + version + "," + build_release + "-" + branch + ":" + getTimeString();
+            return publisher + "/" + name + "@" + version + "," + build_release + "-" + branch + ":" +
+                    getPackagingDate();
         }
 
-        char getTimeString() const {
-            char strtime;
-            strftime(&strtime, 16, "%Y%m%dT%H%M%SZ", &packaging_date);
-            return strtime;
+        string getPackagingDate() const {
+            char buffer[80];
+            strftime(buffer, 80, "%Y%m%dT%H%M%SZ", &packaging_date);
+            return string(buffer);
         }
 
         void setPackagingDate(const string &datestring){
             stringstream ss(datestring);
-            ss >> std::get_time(&packaging_date, "%Y%m%dT%H%M%SZ");
+            ss >> get_time(&packaging_date, "%Y%m%dT%H%M%SZ");
         }
 
         void setFmri(const std::string& fmri);
@@ -102,125 +120,6 @@ namespace pkg {
         void markRenamed();
 
         PackageInfo operator+=(const PackageInfo& alternate);
-
-        template <typename Writer>
-        void Serialize(Writer& writer) const{
-            writer.StartObject();
-            writer.String("publisher");
-            writer.String(publisher.c_str());
-            writer.String("name");
-            writer.String(name.c_str());
-            writer.String("version");
-            writer.String(version.c_str());
-            writer.String("build");
-            writer.String(build_release.c_str());
-            writer.String("branch");
-            writer.String(branch.c_str());
-            writer.String("packaging_date");
-            writer.String(getTimeString());
-            if(!signature.empty()) {
-                writer.String("signature");
-                writer.String(signature.c_str());
-            }
-            writer.String("summary");
-            writer.String(summary.c_str());
-            if(!description.empty()) {
-                writer.String("description");
-                writer.String(description.c_str());
-            }
-            if(!humanversion.empty()){
-                writer.String("humanversion");
-                writer.String(humanversion.c_str());
-            }
-            writer.String("classifications");
-            writer.StartArray();
-            for(auto classi : classification){
-                writer.String(classi);
-            }
-            writer.EndArray();
-            writer.String("states");
-            writer.StartArray();
-            for(int state : states){
-                writer.Int(state);
-            }
-            writer.EndArray();
-
-            if(!attrs.empty()) {
-                writer.String("attrs");
-                writer.StartArray();
-                for (auto attr : attrs) {
-                    attr.Serialize(writer);
-                }
-                writer.EndArray();
-            }
-
-            if(!dependencies.empty()) {
-                writer.String("dependencies");
-                writer.StartArray();
-                for (auto dep : dependencies) {
-                    dep.Serialize(writer);
-                }
-                writer.EndArray();
-            }
-
-            writer.EndObject();
-        }
-
-        void Deserialize(const Value& rootValue){
-            if(rootValue.IsObject()){
-                this->publisher = rootValue["publisher"].GetString();
-                this->name = rootValue["name"].GetString();
-                this->version = rootValue["version"].GetString();
-                this->build_release = rootValue["build"].GetString();
-                this->branch = rootValue["branch"].GetString();
-                setPackagingDate(rootValue["packaging_date"].GetString());
-                if(rootValue.HasMember("signature")) {
-                    this->signature = rootValue["signature"].GetString();
-                }
-                this->summary = rootValue["summary"].GetString();
-                if(rootValue.HasMember("description")) {
-                    this->description = rootValue["description"].GetString();
-                }
-                if(rootValue.HasMember("humanversion")) {
-                    this->humanversion = rootValue["humanversion"].GetString();
-                }
-                const Value& states = rootValue["states"];
-                for (auto itr = states.Begin(); itr != states.End(); ++itr){
-                    this->states.push_back(itr->GetInt());
-                }
-                const Value& classes = rootValue["classifications"];
-                for (auto itr = classes.Begin(); itr != classes.End(); ++itr){
-                    this->classification.push_back(itr->GetString());
-                }
-                if (rootValue.HasMember("attrs"))
-                {
-                    const Value& attrs = rootValue["attrs"];
-                    if (attrs.IsArray())
-                    {
-                        for (rapidjson::SizeType i = 0; i < attrs.Size(); i++)
-                        {
-                            AttributeAction attr;
-                            attr.Deserialize(attrs[i]);
-                            this->attrs.push_back(attr);
-                        }
-                    }
-                }
-
-                if (rootValue.HasMember("dependencies"))
-                {
-                    const Value& dependencies = rootValue["dependencies"];
-                    if (dependencies.IsArray())
-                    {
-                        for (rapidjson::SizeType i = 0; i < dependencies.Size(); i++)
-                        {
-                            DependAction dep;
-                            dep.Deserialize(dependencies[i]);
-                            this->dependencies.push_back(dep);
-                        }
-                    }
-                }
-            }
-        }
 
     };
 

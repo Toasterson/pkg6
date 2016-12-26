@@ -5,20 +5,11 @@
 
 #ifndef PKG6_ICATALOGACCESS_H
 #define PKG6_ICATALOGACCESS_H
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/ostreamwrapper.h>
-#include <rapidjson/filereadstream.h>
-#include <string>
-#include <fstream>
-#include <rapidjson/document.h>
-#include <boost/filesystem.hpp>
 #include <package/PackageInfo.h>
+#include <string>
 
-namespace fs = boost::filesystem;
-
+using namespace pkg;
 using namespace std;
-using namespace rapidjson;
 
 // Interface for Low-level functions of the Catalog (Filesystem, TCP, HTTP)
 // As interface in order to be able to Mock them out.
@@ -37,6 +28,8 @@ namespace pkg {
 
         //Create an empty Catalog
         virtual bool create() = 0;
+
+        virtual bool does_apply() = 0;
 
         virtual int getPackageCount() = 0;
 

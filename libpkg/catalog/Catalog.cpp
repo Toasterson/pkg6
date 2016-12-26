@@ -5,69 +5,72 @@
 
 #include "Catalog.h"
 #include "CatalogError.h"
-#include <catalog/handler/filestreamparser/V1BaseHandler.h>
-#include <catalog/handler/filestreamparser/V1DependencySummaryHandler.h>
 
 
 namespace fs = boost::filesystem;
 using namespace rapidjson;
 
-void pkg::Catalog::upgrade_format(ICatalogStorage &newInterface){
+void pkg::Catalog::upgrade_format(){
     read_only = false;
     //TODO Error handling
-
-    newInterface.create();
-
+    v1interface.transferPackages(v2interface);
 }
 
 pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_only, const bool &do_sign):
+    root{root},
+    name{name},
     read_only{read_only},
     do_sign{do_sign},
-    needs_upgrade{false}
+    needs_upgrade{false},
+    v1interface{V1CatalogStorage(root, name)},
+    v2interface{V2CatalogStorage(root, name)}
 {
     //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
     // As the Catalog in pkg6 will always reside on disk a load is not required
-
+    if (!v2interface.does_apply()){
+        needs_upgrade = true;
+        this->read_only = true;
+    }
 }
 
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //TODO Errorhandeling
-        interface.addPackage(pkg);
+        v2interface.addPackage(pkg);
     }
 }
 
 void pkg::Catalog::updatePackage(pkg::PackageInfo &updatePkg) {
     if(!read_only){
         //TODO Errorhandeling
-        interface.updatePackage(updatePkg);
+        v2interface.updatePackage(updatePkg);
     }
 }
 
 void pkg::Catalog::addOrUpdatePackage(pkg::PackageInfo &pkg) {
     if(!read_only){
         //TODO Errorhandeling
-        interface.addOrUpdatePackage(pkg);
+        v2interface.addOrUpdatePackage(pkg);
     }
 }
 
 void pkg::Catalog::removePackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //TODO Errorhandeling
-        interface.removePackage(pkg);
+        v2interface.removePackage(pkg);
     }
 }
 
 void pkg::Catalog::savePackage(pkg::PackageInfo &pkg) {
     if(!read_only){
         //TODO Errorhandeling
-        interface.savePackage(pkg);
+        v2interface.savePackage(pkg);
     }
 }
 
 void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
-    if(interface.packageExists(pkg.getFmri())) {
-        pkg = interface.loadPackage(pkg.getFmri());
+    if(v2interface.packageExists(pkg.getFmri())) {
+        pkg = v2interface.loadPackage(pkg.getFmri());
     } else {
         throw new pkg::exception::PackageLoadException("Package "+pkg.getFmri()+" does not exist");
     }
@@ -126,7 +129,7 @@ bool pkg::Catalog::contains(const pkg::PackageInfo &pkg) {
 
 
 bool pkg::Catalog::contains(std::string fmri) {
-    return interface.packageExists(fmri);
+    return v2interface.packageExists(fmri);
 }
 
 bool pkg::Catalog::needsUpgrade() {

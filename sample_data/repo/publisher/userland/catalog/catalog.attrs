@@ -1,0 +1,30 @@
+{
+  "created": "20161224T160808.632593Z",
+  "last-modified": "20161224T161749.202734Z",
+  "package-count": 2,
+  "package-version-count": 2,
+  "parts": {
+    "catalog.base.C": {
+      "last-modified": "20161224T161749.202734Z",
+      "signature-sha-1": "9534c505d72085797cf142d9c69ea0adc5b2449c"
+    },
+    "catalog.dependency.C": {
+      "last-modified": "20161224T161749.202734Z",
+      "signature-sha-1": "f98917b705e74ae20e39a06a7c306cae68c7bd72"
+    },
+    "catalog.summary.C": {
+      "last-modified": "20161224T161749.202734Z",
+      "signature-sha-1": "3823dece5982820dd3128b5f9eeeb9448ffea1b7"
+    }
+  },
+  "updates": {
+    "update.20161224T16Z.C": {
+      "last-modified": "20161224T161749.202734Z",
+      "signature-sha-1": "183259ff19ecb76bb9766776e09e8ab544828419"
+    }
+  },
+  "version": 1,
+  "_SIGNATURE": {
+    "sha-1": "03bf585ff2dfd495fa752154baf85d2add2c968b"
+  }
+}

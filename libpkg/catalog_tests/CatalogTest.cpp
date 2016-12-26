@@ -4,21 +4,17 @@
 //
 
 #include <gtest/gtest.h>
-#include "gmock/gmock.h"
-#include "mock_ICatalogIO.h"
-#include <catalog/Catalog.h>
+#include "mock_CatalogStorage.h"
+#include <gmock/gmock.h>
 
 using ::testing::Return;
+using ::testing::AtLeast;
 
 namespace {
 
-    TEST(CatalogTest, importLegacy){
-        MockICatalogIO mockICatalogIO("");
-        EXPECT_CALL(mockICatalogIO, createStatePath()).WillRepeatedly(Return(true));
-    }
-
     TEST(CatalogTest, Create){
-
+        MockICatalogStorage mock;
+        EXPECT_CALL(mock, create()).Times(AtLeast(1));
     }
 
     TEST(CatalogTest, ResolvePackage){
