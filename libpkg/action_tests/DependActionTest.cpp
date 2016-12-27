@@ -8,6 +8,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <catalog/handler/storage/JSONPackageSerializer.h>
 
 using namespace pkg::action;
 
@@ -22,9 +23,10 @@ namespace {
         virtual void SetUp(){
             Document doc;
             doc.Parse(depend_json.c_str());
-            SerializeTest.Deserialize(doc);
+            SerializeTest = ser.DeserializeDependAction(doc);
             createTest = DependAction(act_string);
         }
+        JSONPackageSerializer ser;
         DependAction SerializeTest;
         DependAction createTest;
         std::string depend_json;
@@ -39,7 +41,9 @@ namespace {
     TEST_F(DependActionTest, Serialize){
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        SerializeTest.Serialize(writer);
+        Document doc;
+        ser.SerializeDependencyAction(SerializeTest, doc);
+        doc.Accept(writer);
         ASSERT_STREQ(depend_json.c_str(), buffer.GetString());
     }
 

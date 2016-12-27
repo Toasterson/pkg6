@@ -35,48 +35,6 @@ namespace pkg{
             void install(){}
 
             bool validate(){ return true; }
-
-            template <typename Writer>
-            void Serialize(Writer& writer) const{
-                if(!name.empty()) {
-                    writer.StartObject();
-                    writer.String(name.c_str());
-                    writer.StartArray();
-                    for (auto value : values) {
-                        writer.String(value.c_str());
-                    }
-                    if (!optionals.empty()) {
-                        writer.String("opt");
-                        writer.StartObject();
-                        for (auto pair: optionals) {
-                            writer.String(pair.first.c_str());
-                            writer.String(pair.second.c_str());
-                        }
-                        writer.EndObject();
-                    }
-                    writer.EndArray();
-                    writer.EndObject();
-                }
-            }
-
-            void Deserialize(const Value& rootValue){
-                if(rootValue.IsObject()){
-                    for(auto itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
-                        if(itr->name.GetString() == "opt"){
-                            for(auto itr2 = itr->value.MemberBegin(); itr2 != itr->value.MemberEnd(); ++itr2){
-                                optionals.insert(std::pair<std::string,std::string>(itr2->name.GetString(), itr2->value.GetString()));
-                            }
-                        } else {
-                            name = itr->name.GetString();
-                            if (itr->value.IsArray()) {
-                                for (rapidjson::SizeType i = 0; i < itr->value.Size(); i++) {
-                                    values.push_back(itr->value[i].GetString());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         };
     }
 }

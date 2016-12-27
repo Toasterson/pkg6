@@ -15,6 +15,7 @@ namespace {
     TEST(CatalogTest, Create){
         MockICatalogStorage mock;
         EXPECT_CALL(mock, create()).Times(AtLeast(1));
+
     }
 
     TEST(CatalogTest, ResolvePackage){

@@ -5,6 +5,7 @@
 #include <action/AttributeAction.h>
 #include <gtest/gtest.h>
 #include <rapidjson/document.h>
+#include <catalog/handler/storage/JSONPackageSerializer.h>
 
 using namespace pkg::action;
 
@@ -68,8 +69,8 @@ namespace {
     TEST(AttributeAction, Deserialize){
         Document doc;
         doc.Parse("{\"userland.info.git-remote\":[\"git://github.com/OpenIndiana/oi-userland.git\"]}");
-        AttributeAction act;
-        act.Deserialize(doc);
+        JSONPackageSerializer ser;
+        AttributeAction act = ser.DeserializeAttributeAction(doc);
         EXPECT_STREQ("userland.info.git-remote", act.name.c_str());
         EXPECT_STREQ("git://github.com/OpenIndiana/oi-userland.git", act.values[0].c_str());
     }

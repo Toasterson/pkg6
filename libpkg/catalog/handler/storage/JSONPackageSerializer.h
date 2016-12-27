@@ -10,11 +10,14 @@
 #include <package/PackageInfo.h>
 
 class JSONPackageSerializer {
+    MemoryPoolAllocator<CrtAllocator> alloc;
 public:
     void Serialize(const pkg::PackageInfo &pkg, Value &val);
-    void SerializeAttributeAction(const pkg::PackageInfo &pkg, Value &val);
-    void SerializeDependencyAction(const pkg::PackageInfo &pkg, Value &val);
+    void SerializeAttributeAction(const AttributeAction &attr, Value &val);
+    void SerializeDependencyAction(const DependAction &dep, Value &val);
     pkg::PackageInfo Deserialize(Value &rootValue);
+    pkg::action::AttributeAction DeserializeAttributeAction(const Value &rootValue);
+    pkg::action::DependAction DeserializeDependAction(const Value &rootValue);
 };
 
 

@@ -9,13 +9,13 @@
 namespace {
     class ImageTest : public ::testing::Test {
     public:
-        ImageTest(): conf(), img(""){}
+        ImageTest(){}//: conf(), img(""){}
 
         virtual void SetUp() {
-            conf.setPublisher("openindiana.org", pkg::Publisher("http://pkg.openindiana.org/hipster"));
+            //conf.setPublisher("openindiana.org", pkg::Publisher("http://pkg.openindiana.org/hipster"));
         }
-        pkg::ImageConfig conf;
-        pkg::Image img;
+        //pkg::ImageConfig conf;
+        //pkg::Image img;
     };
 
     TEST_F(ImageTest, UpgradeFormat){

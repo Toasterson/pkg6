@@ -33,44 +33,6 @@ namespace pkg{
             void install(){}
 
             bool validate(){ return true; }
-
-            template <typename Writer>
-            void Serialize(Writer& writer) const{
-                writer.StartObject();
-                writer.String("fmri");
-                writer.String(fmri.c_str());
-                writer.String("type");
-                writer.String(type.c_str());
-                if(!predicate.empty()){
-                    writer.String("predicate");
-                    writer.String(predicate.c_str());
-                }
-                if(!optional.empty()){
-                    for(std::pair<std::string,std::string> opt : optional){
-                        writer.String(opt.first.c_str());
-                        writer.String(opt.second.c_str());
-                    }
-                }
-                writer.EndObject();
-            }
-
-            void Deserialize(const Value& rootValue){
-                if(rootValue.IsObject()){
-                    for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
-                        std::string name = itr->name.GetString();
-                        std::string value = itr->value.GetString();
-                        if(name == "fmri"){
-                            fmri = value;
-                        } else if(name == "type"){
-                            type = value;
-                        } else if(name == "predicate"){
-                            predicate = value;
-                        } else {
-                            optional.insert(std::pair<std::string,std::string>(name, value));
-                        }
-                    }
-                }
-            }
         };
     }
 }

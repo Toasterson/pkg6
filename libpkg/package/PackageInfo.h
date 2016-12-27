@@ -120,7 +120,7 @@ namespace pkg {
         void markRenamed();
 
         PackageInfo operator+=(const PackageInfo& alternate);
-
+        //TODO overload of == operator
     };
 
 };

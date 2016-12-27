@@ -71,6 +71,7 @@ namespace {
     }
 
     TEST_F(PKGINFOTest, InOut){
+        //TODO Out-In is probably more relaible
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
         Document doc;

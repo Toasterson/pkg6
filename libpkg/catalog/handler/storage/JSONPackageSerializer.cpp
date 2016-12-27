@@ -6,41 +6,56 @@
 #include "JSONPackageSerializer.h"
 
 void JSONPackageSerializer::Serialize(const pkg::PackageInfo &pkg, Value &val) {
-    val["publisher"].SetString(StringRef(pkg.publisher));
-    val["name"].SetString(StringRef(pkg.name));
-    val["version"].SetString(StringRef(pkg.version));
-    val["build"].SetString(StringRef(pkg.build_release));
-    val["branch"].SetString(StringRef(pkg.branch));
-    val["packaging_date"].SetString(StringRef(pkg.getPackagingDate()));
-    if(!pkg.signature.empty()) {
-        val["signature"].SetString(StringRef(pkg.signature));
+    if(!val.IsObject()) {
+        val.SetObject();
     }
-    val["summary"].SetString(StringRef(pkg.summary));
+    val.AddMember<string>(StringRef("publisher"), pkg.publisher, alloc);
+    val.AddMember<string>(StringRef("name"), pkg.name, alloc);
+    val.AddMember<string>(StringRef("version"), pkg.version, alloc);
+    val.AddMember<string>(StringRef("build"), pkg.build_release, alloc);
+    val.AddMember<string>(StringRef("branch"), pkg.branch, alloc);
+    val.AddMember<string>(StringRef("packaging_date"), pkg.getPackagingDate(), alloc);
+
+    if(!pkg.signature.empty()) {
+        val.AddMember<string>(StringRef("signature"), pkg.signature, alloc);
+    }
+    val.AddMember<string>(StringRef("summary"), pkg.summary, alloc);
     if(!pkg.description.empty()) {
-        val["description"].SetString(StringRef(pkg.description));
+        val.AddMember<string>(StringRef("description"), pkg.description, alloc);
     }
     if(!pkg.humanversion.empty()){
-        val["humanversion"].SetString(StringRef(pkg.humanversion));
+        val.AddMember<string>(StringRef("humanversion"), pkg.humanversion, alloc);
     }
     Value classification(kArrayType);
-    for(int i = 0; i < pkg.classification.size(); i++){
-        classification[i].SetString(StringRef(pkg.classification[i]));
+    for(auto classi : pkg.classification){
+        classification.PushBack(Value(StringRef(classi), alloc), alloc);
     }
-    val["classification"] = classification;
+    val.AddMember(StringRef("classifications"), classification, alloc);
     Value states(kArrayType);
-    for(int i = 0; i < pkg.states.size(); i++){
-        states[i].SetInt(pkg.states[i]);
+    for(auto state : pkg.states){
+        states.PushBack<int>(state, alloc);
     }
-    val["states"] = states;
+    val.AddMember(StringRef("states"), states, alloc);
     if(!pkg.attrs.empty()){
-        Value attrs(kObjectType);
-        SerializeAttributeAction(pkg, attrs);
-        val["attrs"] = attrs;
+        Value attrs(kArrayType);
+        for(auto attr : pkg.attrs) {
+            if (!attr.name.empty()) {
+                Value valAttr(kObjectType);
+                SerializeAttributeAction(attr, valAttr);
+                attrs.PushBack(valAttr, alloc);
+            }
+        }
+        val.AddMember(StringRef("attrs"), attrs, alloc);
+
     }
     if(!pkg.dependencies.empty()){
-        Value deps(kObjectType);
-        SerializeDependencyAction(pkg, deps);
-        val["dependencies"] = deps;
+        Value deps(kArrayType);
+        for(auto dep : pkg.dependencies){
+            Value valDep(kObjectType);
+            SerializeDependencyAction(dep, valDep);
+            deps.PushBack(valDep, alloc);
+        }
+        val.AddMember(StringRef("dependencies"), deps, alloc);
     }
 }
 
@@ -78,9 +93,7 @@ pkg::PackageInfo JSONPackageSerializer::Deserialize(Value &rootValue) {
             {
                 for (rapidjson::SizeType i = 0; i < attrs.Size(); i++)
                 {
-                    AttributeAction attr;
-                    attr.Deserialize(attrs[i]);
-                    pkg.attrs.push_back(attr);
+                    pkg.attrs.push_back(DeserializeAttributeAction(attrs[i]));
                 }
             }
         }
@@ -92,9 +105,7 @@ pkg::PackageInfo JSONPackageSerializer::Deserialize(Value &rootValue) {
             {
                 for (rapidjson::SizeType i = 0; i < dependencies.Size(); i++)
                 {
-                    DependAction dep;
-                    dep.Deserialize(dependencies[i]);
-                    pkg.dependencies.push_back(dep);
+                    pkg.dependencies.push_back(DeserializeDependAction(dependencies[i]));
                 }
             }
         }
@@ -102,10 +113,75 @@ pkg::PackageInfo JSONPackageSerializer::Deserialize(Value &rootValue) {
     return pkg;
 }
 
-void JSONPackageSerializer::SerializeAttributeAction(const pkg::PackageInfo &pkg, Value &val) {
-
+void JSONPackageSerializer::SerializeAttributeAction(const AttributeAction &attr, Value &val) {
+    val.SetObject();
+    Value valValues(kArrayType);
+    for (auto value : attr.values) {
+        valValues.PushBack(StringRef(value), alloc);
+    }
+    val.AddMember(StringRef(attr.name), valValues, alloc);
+    if (!attr.optionals.empty()) {
+        Value valOpt(kObjectType);
+        for (auto item: attr.optionals) {
+            valOpt.AddMember<string>(StringRef(item.first), item.second, alloc);
+        }
+        val.AddMember(StringRef("opt"), valOpt, alloc);
+    };
 }
 
-void JSONPackageSerializer::SerializeDependencyAction(const pkg::PackageInfo &pkg, Value &val) {
+void JSONPackageSerializer::SerializeDependencyAction(const DependAction &dep, Value &val) {
+    val.SetObject();
+    val.AddMember<string>(StringRef("fmri"), dep.fmri, alloc);
+    val.AddMember<string>(StringRef("type"), dep.type, alloc);
+    if(!dep.predicate.empty()){
+        val.AddMember<string>(StringRef("predicate"), dep.predicate, alloc);
+    }
+    if(!dep.optional.empty()){
+        Value valOpt(kObjectType);
+        for(std::pair<string,string> opt : dep.optional){
+            valOpt.AddMember<string>(StringRef(opt.first), opt.second, alloc);
+        }
+        val.AddMember(StringRef("opt"), valOpt, alloc);
+    }
+}
 
+pkg::action::AttributeAction JSONPackageSerializer::DeserializeAttributeAction(const Value &rootValue) {
+    AttributeAction attr;
+    if(rootValue.IsObject()){
+        for(auto itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
+            if(itr->name.GetString() == "opt"){
+                for(auto itr2 = itr->value.MemberBegin(); itr2 != itr->value.MemberEnd(); ++itr2){
+                    attr.optionals.insert(std::pair<std::string,std::string>(itr2->name.GetString(), itr2->value.GetString()));
+                }
+            } else {
+                attr.name = itr->name.GetString();
+                if (itr->value.IsArray()) {
+                    for (rapidjson::SizeType i = 0; i < itr->value.Size(); i++) {
+                        attr.values.push_back(itr->value[i].GetString());
+                    }
+                }
+            }
+        }
+    }
+    return attr;
+}
+
+pkg::action::DependAction JSONPackageSerializer::DeserializeDependAction(const Value &rootValue) {
+    DependAction dep;
+    if(rootValue.IsObject()){
+        for(Value::ConstMemberIterator itr = rootValue.MemberBegin(); itr != rootValue.MemberEnd(); ++itr){
+            std::string name = itr->name.GetString();
+            std::string value = itr->value.GetString();
+            if(name == "fmri"){
+                dep.fmri = value;
+            } else if(name == "type"){
+                dep.type = value;
+            } else if(name == "predicate"){
+                dep.predicate = value;
+            } else {
+                dep.optional.insert(std::pair<std::string,std::string>(name, value));
+            }
+        }
+    }
+    return dep;
 }
