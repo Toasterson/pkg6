@@ -41,9 +41,7 @@ namespace {
     TEST_F(DependActionTest, Serialize){
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        Document doc;
-        ser.SerializeDependencyAction(SerializeTest, doc);
-        doc.Accept(writer);
+        ser.SerializeDependencyAction(SerializeTest, writer);
         ASSERT_STREQ(depend_json.c_str(), buffer.GetString());
     }
 

@@ -61,19 +61,36 @@ bool pkg::V2CatalogStorage::updatePackage(const pkg::PackageInfo &updatePkg) {
 bool pkg::V2CatalogStorage::savePackage(const pkg::PackageInfo &pkg) {
     //Save Package to disk as one json per package
     try {
-        Document doc;
+        //Load File
+        Document jsonFile;
         ifstream ifs(filePath(pkg));
         IStreamWrapper isw(ifs);
-        doc.ParseStream(isw);
+        jsonFile.ParseStream(isw);
         ifs.close();
-        Value val(kObjectType);
+
+        //Serialize Package to JSON String
         JSONPackageSerializer ser;
-        ser.Serialize(pkg, val);
-        doc[FMRIVersionPart(pkg).c_str()] = val;
+        StringBuffer buff;
+        Writer<StringBuffer> memwriter;
+        ser.Serialize(pkg, memwriter);
+
+        //Put that Json String into Document class for handling
+        Document pkgDoc;
+        pkgDoc.Parse(buff.GetString());
+
+        //Add Document to File
+        string partname = FMRIVersionPart(pkg);
+        if(jsonFile.HasMember(partname)){
+            jsonFile.RemoveMember(partname);
+        }
+        jsonFile.AddMember(StringRef(partname), pkgDoc, jsonFile.GetAllocator());
+
+
+        //Save the File again
         ofstream ofs(filePath(pkg));
         OStreamWrapper osw(ofs);
         Writer<OStreamWrapper> fileWriter(osw);
-        doc.Accept(fileWriter);
+        jsonFile.Accept(fileWriter);
     } catch (...){
         return false;
     }

@@ -5,10 +5,8 @@
 
 #include <gtest/gtest.h>
 #include <package/PackageInfo.h>
-#include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <catalog/handler/storage/JSONPackageSerializer.h>
-#include "rapidjson/stringbuffer.h"
 
 using namespace pkg;
 
@@ -70,13 +68,24 @@ namespace {
         ASSERT_STREQ("Testing", pkg1.attrs[0].name.c_str());
     }
 
-    TEST_F(PKGINFOTest, InOut){
-        //TODO Out-In is probably more relaible
-        StringBuffer buffer;
-        Writer<StringBuffer> writer(buffer);
+    TEST_F(PKGINFOTest, Equals){
+        ASSERT_TRUE(pgadmin == pgadmin);
+    }
+
+    TEST_F(PKGINFOTest, DeserializeEquals){
         Document doc;
-        ser.Serialize(pgadmin, doc);
-        doc.Accept(writer);
-        ASSERT_STREQ(pgadmin_string.c_str(), buffer.GetString());
+        doc.Parse(pgadmin_string);
+        PackageInfo pgadmin2 = ser.Deserialize(doc);
+        ASSERT_TRUE(pgadmin == pgadmin2);
+    }
+
+    TEST_F(PKGINFOTest, OutIn){
+        StringBuffer buf;
+        Writer<StringBuffer> wr;
+        ser.Serialize(pgadmin, wr);
+        Document doc;
+        doc.Parse(buf.GetString());
+        PackageInfo pkg2 = ser.Deserialize(doc);
+        ASSERT_TRUE(pgadmin == pkg2);
     }
 }

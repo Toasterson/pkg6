@@ -39,3 +39,10 @@ std::string pkg::action::AttributeAction::toActionString() {
     }
     return stringStream.str();
 }
+
+bool pkg::action::AttributeAction::hasValue(const std::string &value) {
+    for(auto val : values){
+        if(val == value) return true;
+    }
+    return false;
+}

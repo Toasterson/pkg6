@@ -139,6 +139,43 @@ void pkg::PackageInfo::commitManifest(istream &manifest) {
     //TODO Fill attributes from actions like csize size etc.
 }
 
+bool pkg::PackageInfo::operator==(pkg::PackageInfo &alternate) {
+    if(this->getFmri() != alternate.getFmri()) return false;
+    if(this->description != alternate.description) return false;
+    if(this->summary != alternate.summary) return false;
+    for(auto attr : this->attrs){
+        if(!alternate.hasAttr(attr)) return false;
+    }
+    for(auto dep : this->dependencies){
+        if(!alternate.hasDependency(dep)) return false;
+    }
+    //TODO as soon as we have more actions add them here aswell.
+    return true;
+}
+
+bool pkg::PackageInfo::hasAttr(const AttributeAction &alternate, const bool &exact) {
+    for(auto attr : attrs){
+        if(exact){
+            if (attr.name == alternate.name){
+                for(auto value : alternate.values){
+                    if(!attr.hasValue(value)) return false;
+                }
+                return true;
+            }
+        } else {
+            if (attr.name == alternate.name) return true;
+        }
+    }
+    return false;
+}
+
+bool pkg::PackageInfo::hasDependency(const DependAction &alternate) {
+    for(auto dep : dependencies){
+        if(dep.fmri == alternate.fmri && dep.type == alternate.type) return true;
+    }
+    return false;
+}
+
 
 
 

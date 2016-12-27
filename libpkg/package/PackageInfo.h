@@ -119,8 +119,12 @@ namespace pkg {
 
         void markRenamed();
 
+        bool hasAttr(const AttributeAction &alternate, const bool &exact = false);
+
+        bool hasDependency(const DependAction &alternate);
+
         PackageInfo operator+=(const PackageInfo& alternate);
-        //TODO overload of == operator
+        bool operator==(PackageInfo& alternate);
     };
 
 };

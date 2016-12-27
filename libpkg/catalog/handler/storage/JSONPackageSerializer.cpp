@@ -5,59 +5,7 @@
 
 #include "JSONPackageSerializer.h"
 
-void JSONPackageSerializer::Serialize(const pkg::PackageInfo &pkg, Value &val) {
-    if(!val.IsObject()) {
-        val.SetObject();
-    }
-    val.AddMember<string>(StringRef("publisher"), pkg.publisher, alloc);
-    val.AddMember<string>(StringRef("name"), pkg.name, alloc);
-    val.AddMember<string>(StringRef("version"), pkg.version, alloc);
-    val.AddMember<string>(StringRef("build"), pkg.build_release, alloc);
-    val.AddMember<string>(StringRef("branch"), pkg.branch, alloc);
-    val.AddMember<string>(StringRef("packaging_date"), pkg.getPackagingDate(), alloc);
 
-    if(!pkg.signature.empty()) {
-        val.AddMember<string>(StringRef("signature"), pkg.signature, alloc);
-    }
-    val.AddMember<string>(StringRef("summary"), pkg.summary, alloc);
-    if(!pkg.description.empty()) {
-        val.AddMember<string>(StringRef("description"), pkg.description, alloc);
-    }
-    if(!pkg.humanversion.empty()){
-        val.AddMember<string>(StringRef("humanversion"), pkg.humanversion, alloc);
-    }
-    Value classification(kArrayType);
-    for(auto classi : pkg.classification){
-        classification.PushBack(Value(StringRef(classi), alloc), alloc);
-    }
-    val.AddMember(StringRef("classifications"), classification, alloc);
-    Value states(kArrayType);
-    for(auto state : pkg.states){
-        states.PushBack<int>(state, alloc);
-    }
-    val.AddMember(StringRef("states"), states, alloc);
-    if(!pkg.attrs.empty()){
-        Value attrs(kArrayType);
-        for(auto attr : pkg.attrs) {
-            if (!attr.name.empty()) {
-                Value valAttr(kObjectType);
-                SerializeAttributeAction(attr, valAttr);
-                attrs.PushBack(valAttr, alloc);
-            }
-        }
-        val.AddMember(StringRef("attrs"), attrs, alloc);
-
-    }
-    if(!pkg.dependencies.empty()){
-        Value deps(kArrayType);
-        for(auto dep : pkg.dependencies){
-            Value valDep(kObjectType);
-            SerializeDependencyAction(dep, valDep);
-            deps.PushBack(valDep, alloc);
-        }
-        val.AddMember(StringRef("dependencies"), deps, alloc);
-    }
-}
 
 pkg::PackageInfo JSONPackageSerializer::Deserialize(Value &rootValue) {
     pkg::PackageInfo pkg;
@@ -113,38 +61,6 @@ pkg::PackageInfo JSONPackageSerializer::Deserialize(Value &rootValue) {
     return pkg;
 }
 
-void JSONPackageSerializer::SerializeAttributeAction(const AttributeAction &attr, Value &val) {
-    val.SetObject();
-    Value valValues(kArrayType);
-    for (auto value : attr.values) {
-        valValues.PushBack(StringRef(value), alloc);
-    }
-    val.AddMember(StringRef(attr.name), valValues, alloc);
-    if (!attr.optionals.empty()) {
-        Value valOpt(kObjectType);
-        for (auto item: attr.optionals) {
-            valOpt.AddMember<string>(StringRef(item.first), item.second, alloc);
-        }
-        val.AddMember(StringRef("opt"), valOpt, alloc);
-    };
-}
-
-void JSONPackageSerializer::SerializeDependencyAction(const DependAction &dep, Value &val) {
-    val.SetObject();
-    val.AddMember<string>(StringRef("fmri"), dep.fmri, alloc);
-    val.AddMember<string>(StringRef("type"), dep.type, alloc);
-    if(!dep.predicate.empty()){
-        val.AddMember<string>(StringRef("predicate"), dep.predicate, alloc);
-    }
-    if(!dep.optional.empty()){
-        Value valOpt(kObjectType);
-        for(std::pair<string,string> opt : dep.optional){
-            valOpt.AddMember<string>(StringRef(opt.first), opt.second, alloc);
-        }
-        val.AddMember(StringRef("opt"), valOpt, alloc);
-    }
-}
-
 pkg::action::AttributeAction JSONPackageSerializer::DeserializeAttributeAction(const Value &rootValue) {
     AttributeAction attr;
     if(rootValue.IsObject()){
@@ -184,4 +100,110 @@ pkg::action::DependAction JSONPackageSerializer::DeserializeDependAction(const V
         }
     }
     return dep;
+}
+
+template<typename Writer>
+void JSONPackageSerializer::Serialize(const pkg::PackageInfo &pkg, Writer &writer) const {
+    writer.StartObject();
+    writer.String("publisher");
+    writer.String(pkg.publisher.c_str());
+    writer.String("name");
+    writer.String(pkg.name.c_str());
+    writer.String("version");
+    writer.String(pkg.version.c_str());
+    writer.String("build");
+    writer.String(pkg.build_release.c_str());
+    writer.String("branch");
+    writer.String(pkg.branch.c_str());
+    writer.String("packaging_date");
+    writer.String(pkg.getPackagingDate());
+    if(!pkg.signature.empty()) {
+        writer.String("signature");
+        writer.String(pkg.signature.c_str());
+    }
+    writer.String("summary");
+    writer.String(pkg.summary.c_str());
+    if(!pkg.description.empty()) {
+        writer.String("description");
+        writer.String(pkg.description.c_str());
+    }
+    if(!pkg.humanversion.empty()){
+        writer.String("humanversion");
+        writer.String(pkg.humanversion.c_str());
+    }
+    writer.String("classifications");
+    writer.StartArray();
+    for(auto classi : pkg.classification){
+        writer.String(classi);
+    }
+    writer.EndArray();
+    writer.String("states");
+    writer.StartArray();
+    for(int state : pkg.states){
+        writer.Int(state);
+    }
+    writer.EndArray();
+
+    if(!pkg.attrs.empty()) {
+        writer.String("attrs");
+        writer.StartArray();
+        for (auto attr : pkg.attrs) {
+            SerializeAttributeAction(attr, writer);
+        }
+        writer.EndArray();
+    }
+
+    if(!pkg.dependencies.empty()) {
+        writer.String("dependencies");
+        writer.StartArray();
+        for (auto dep : pkg.dependencies) {
+            SerializeDependencyAction(dep, writer);
+        }
+        writer.EndArray();
+    }
+
+    writer.EndObject();
+}
+
+template<typename Writer>
+void JSONPackageSerializer::SerializeAttributeAction(const AttributeAction &attr, Writer &writer) const {
+    if(!attr.name.empty()) {
+        writer.StartObject();
+        writer.String(attr.name.c_str());
+        writer.StartArray();
+        for (auto value : attr.values) {
+            writer.String(value.c_str());
+        }
+        if (!attr.optionals.empty()) {
+            writer.String("opt");
+            writer.StartObject();
+            for (auto pair: attr.optionals) {
+                writer.String(pair.first.c_str());
+                writer.String(pair.second.c_str());
+            }
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.EndObject();
+    }
+}
+
+template<typename Writer>
+void JSONPackageSerializer::SerializeDependencyAction(const DependAction &dep, Writer &writer) const {
+    writer.StartObject();
+    writer.String("fmri");
+    writer.String(dep.fmri.c_str());
+    writer.String("type");
+    writer.String(dep.type.c_str());
+    if(!dep.predicate.empty()){
+        writer.String("predicate");
+        writer.String(dep.predicate.c_str());
+    }
+    if(!dep.optional.empty()){
+        for(std::pair<std::string,std::string> opt : dep.optional){
+            writer.String(opt.first.c_str());
+            writer.String(opt.second.c_str());
+        }
+    }
+    writer.EndObject();
 }

@@ -35,6 +35,8 @@ namespace pkg{
             void install(){}
 
             bool validate(){ return true; }
+
+            bool hasValue(const std::string &value);
         };
     }
 }
