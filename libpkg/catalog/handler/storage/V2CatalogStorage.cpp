@@ -71,7 +71,7 @@ bool pkg::V2CatalogStorage::savePackage(const pkg::PackageInfo &pkg) {
         //Serialize Package to JSON String
         JSONPackageSerializer ser;
         StringBuffer buff;
-        Writer<StringBuffer> memwriter;
+        Writer<StringBuffer> memwriter(buff);
         ser.Serialize(pkg, memwriter);
 
         //Put that Json String into Document class for handling

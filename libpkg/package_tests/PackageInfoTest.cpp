@@ -81,7 +81,7 @@ namespace {
 
     TEST_F(PKGINFOTest, OutIn){
         StringBuffer buf;
-        Writer<StringBuffer> wr;
+        Writer<StringBuffer> wr(buf);
         ser.Serialize(pgadmin, wr);
         Document doc;
         doc.Parse(buf.GetString());

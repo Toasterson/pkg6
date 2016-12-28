@@ -27,7 +27,7 @@ set(LIBPKG_SOURCE_FILES
         libpkg/http_client/HttpClient.cpp libpkg/http_client/HttpClient.h
         libpkg/http_client/HTTPException.h libpkg/image/ImageException.h
         libpkg/publisher/Publisher.h
-        libpkg/action/FileAction.cpp libpkg/action/FileAction.h libpkg/interfaces/ICatalogStorage.h libpkg/catalog/handler/storage/V2CatalogStorage.h libpkg/interfaces/IRepositoryConsumer.h libpkg/interfaces/IImageConfigStorage.h libpkg/interfaces/IImageStorage.h libpkg/interfaces/IPackageStorage.h libpkg/interfaces/IPublisherStorage.h libpkg/catalog/handler/storage/V1CatalogStorage.h libpkg/interfaces/IHistoryStorage.h libpkg/catalog/handler/storage/V2CatalogStorage.cpp libpkg/catalog/handler/storage/V1CatalogStorage.cpp libpkg/catalog/handler/storage/JSONPackageSerializer.cpp libpkg/catalog/handler/storage/JSONPackageSerializer.h)
+        libpkg/action/FileAction.cpp libpkg/action/FileAction.h libpkg/interfaces/ICatalogStorage.h libpkg/catalog/handler/storage/V2CatalogStorage.h libpkg/interfaces/IRepositoryConsumer.h libpkg/interfaces/IImageConfigStorage.h libpkg/interfaces/IImageStorage.h libpkg/interfaces/IPackageStorage.h libpkg/interfaces/IPublisherStorage.h libpkg/catalog/handler/storage/V1CatalogStorage.h libpkg/interfaces/IHistoryStorage.h libpkg/catalog/handler/storage/V2CatalogStorage.cpp libpkg/catalog/handler/storage/V1CatalogStorage.cpp libpkg/catalog/handler/storage/JSONPackageSerializer.h)
 add_library(pkg6 SHARED ${LIBPKG_SOURCE_FILES})
 add_library(tinyxml2 SHARED lib/tinyxml2/tinyxml2.h lib/tinyxml2/tinyxml2.cpp)
 add_executable(pkg pkg/main.cpp)
