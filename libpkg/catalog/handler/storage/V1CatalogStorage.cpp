@@ -85,8 +85,8 @@ bool pkg::V1CatalogStorage::transferPackages(pkg::ICatalogStorage &targetInterfa
     return false;
 }
 
-pkg::PackageInfo pkg::V1CatalogStorage::loadPackage(const string &fmri) {
-    return pkg::PackageInfo();
+bool pkg::V1CatalogStorage::loadPackage(PackageInfo &pkg) {
+    return false;
 }
 
 bool pkg::V1CatalogStorage::removePackage(const pkg::PackageInfo &pkg) {
@@ -109,7 +109,7 @@ bool pkg::V1CatalogStorage::addPackage(const pkg::PackageInfo &pkg) {
     return false;
 }
 
-bool pkg::V1CatalogStorage::packageExists(const string &fmri) {
+bool pkg::V1CatalogStorage::packageExists(const PackageInfo& pkg) {
     return false;
 }
 
@@ -123,4 +123,12 @@ bool pkg::V1CatalogStorage::close() {
 
 bool pkg::V1CatalogStorage::create() {
     return false;
+}
+
+bool V1CatalogStorage::hasPublisher(const string &publisher) {
+    return false;
+}
+
+vector<string> V1CatalogStorage::getPublishers() {
+    return vector<string>();
 }

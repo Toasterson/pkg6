@@ -129,11 +129,11 @@ namespace pkg {
         }
 
         bool isInstalled(const pkg::PackageInfo &pkg){
-            return installed.contains(pkg);
+            return installed.packageExists(pkg);
         }
 
         bool isInstalled(const std::string &fmri){
-            return installed.contains(known.getPackage(fmri));
+            return installed.packageExists(known.getPackage(fmri));
         }
 
     };

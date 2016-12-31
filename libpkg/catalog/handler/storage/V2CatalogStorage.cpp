@@ -113,7 +113,8 @@ bool pkg::V2CatalogStorage::addPackage(const pkg::PackageInfo &pkg) {
 }
 
 bool pkg::V2CatalogStorage::packageExists(const string &fmri) {
-    string fmritmp = fmri;
+    //TODO make version agnostic
+    string fmritmp{fmri};
     if (boost::starts_with(fmritmp, "pkg://")) {
         boost::erase_first(fmritmp, "pkg://");
     } else if (boost::starts_with(fmritmp, "pkg:/")) {
@@ -188,4 +189,22 @@ pkg::PackageInfo pkg::V2CatalogStorage::loadPackage(const string &fmri) {
     JSONPackageSerializer deser;
     pkg += deser.Deserialize(doc[FMRIVersionPart(pkg).c_str()]);
     return pkg;
+}
+
+bool V2CatalogStorage::hasPublisher(const string &publisher) {
+    return fs::is_directory((statePath+"/"+publisher).c_str());
+}
+
+vector<string> V2CatalogStorage::getPublishers() {
+    vector<string> v;
+    for(fs::directory_iterator iter(statePath); iter != fs::directory_iterator(); ++iter){
+        if(fs::is_directory(iter->path())) {
+            v.push_back(iter->path().filename().string());
+        }
+    }
+    return v;
+}
+
+vector<string> V2CatalogStorage::getAllPackageNames() {
+    return vector<string>();
 }

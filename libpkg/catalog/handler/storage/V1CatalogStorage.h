@@ -44,7 +44,11 @@ namespace pkg{
 
         virtual int getPackageVersionCount();
 
-        virtual bool packageExists(const string &fmri);
+        virtual bool packageExists(const PackageInfo& pkg);
+
+        virtual bool hasPublisher(const string& publisher);
+
+        virtual vector<string> getPublishers();
 
         virtual bool addPackage(const pkg::PackageInfo &pkg);
 
@@ -56,7 +60,7 @@ namespace pkg{
 
         virtual bool removePackage(const pkg::PackageInfo &pkg);
 
-        virtual pkg::PackageInfo loadPackage(const string &fmri);
+        virtual bool loadPackage(PackageInfo &pkg);
 
         virtual bool transferPackages(ICatalogStorage &targetInterface);
 

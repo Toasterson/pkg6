@@ -101,7 +101,7 @@ pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
     std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
     pkg::ImagePlan plan(resolved, getImgRoot(), getWriteCachePath(), config);
     for(auto pkg : resolved){
-        if(!installed.contains(pkg) and !plan.contains(pkg)){
+        if(!installed.packageExists(pkg) and !plan.contains(pkg)){
             getNotInstalledDeps(pkg, plan);
             plan.add(pkg);
         }
@@ -111,7 +111,7 @@ pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
 
 void pkg::Image::getNotInstalledDeps(const pkg::PackageInfo &pkg, pkg::ImagePlan &plan) {
     for(auto dep : pkg.dependencies){
-        if(!installed.contains(dep.fmri) and !plan.contains(dep.fmri)){
+        if(!installed.packageExists(dep.fmri) and !plan.contains(dep.fmri)){
             pkg::PackageInfo pack(dep.fmri);
             known.loadPackage(pack);
             getNotInstalledDeps(pack, plan);

@@ -44,6 +44,12 @@ namespace pkg {
 
         virtual bool packageExists(const string &fmri);
 
+        virtual bool hasPublisher(const string& publisher);
+
+        virtual vector<string> getPublishers();
+
+        virtual vector<string> getAllPackageNames();
+
         virtual bool addPackage(const pkg::PackageInfo &pkg);
 
         virtual bool savePackage(const pkg::PackageInfo &pkg);

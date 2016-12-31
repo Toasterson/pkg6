@@ -13,7 +13,7 @@ using namespace rapidjson;
 void pkg::Catalog::upgrade_format(){
     read_only = false;
     //TODO Error handling
-    v1interface.transferPackages(v2interface);
+    oldinterface->transferPackages(v2interface);
 }
 
 pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_only, const bool &do_sign):
@@ -23,11 +23,13 @@ pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_o
     do_sign{do_sign},
     needs_upgrade{false},
     v1interface{V1CatalogStorage(root, name)},
-    v2interface{V2CatalogStorage(root, name)}
+    v2interface{V2CatalogStorage(root, name)},
+    interface{&this->v2interface},
+    oldinterface{&this->v1interface}
 {
     //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
     // As the Catalog in pkg6 will always reside on disk a load is not required
-    if (!v2interface.does_apply()){
+    if (!interface->does_apply()){
         needs_upgrade = true;
         this->read_only = true;
     }
@@ -36,83 +38,57 @@ pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_o
 void pkg::Catalog::addPackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //TODO Errorhandeling
-        v2interface.addPackage(pkg);
+        interface->addPackage(pkg);
     }
 }
 
 void pkg::Catalog::updatePackage(pkg::PackageInfo &updatePkg) {
     if(!read_only){
         //TODO Errorhandeling
-        v2interface.updatePackage(updatePkg);
+        interface->updatePackage(updatePkg);
     }
 }
 
 void pkg::Catalog::addOrUpdatePackage(pkg::PackageInfo &pkg) {
     if(!read_only){
         //TODO Errorhandeling
-        v2interface.addOrUpdatePackage(pkg);
+        interface->addOrUpdatePackage(pkg);
     }
 }
 
 void pkg::Catalog::removePackage(pkg::PackageInfo &pkg) {
     if(!read_only) {
         //TODO Errorhandeling
-        v2interface.removePackage(pkg);
+        interface->removePackage(pkg);
     }
 }
 
 void pkg::Catalog::savePackage(pkg::PackageInfo &pkg) {
     if(!read_only){
         //TODO Errorhandeling
-        v2interface.savePackage(pkg);
+        interface->savePackage(pkg);
     }
 }
 
-void pkg::Catalog::loadPackage(pkg::PackageInfo &pkg) {
-    if(v2interface.packageExists(pkg.getFmri())) {
-        pkg = v2interface.loadPackage(pkg.getFmri());
+pkg::PackageInfo pkg::Catalog::loadPackage(const std::string& fmri) {
+    if(interface->packageExists(fmri)) {
+        return interface->loadPackage(fmri);
     } else {
-        throw new pkg::exception::PackageLoadException("Package "+pkg.getFmri()+" does not exist");
+        throw new pkg::exception::PackageLoadException("Package "+fmri+" does not exist");
     }
 }
 
 pkg::PackageInfo pkg::Catalog::getPackage(const std::string &fmri) {
-    /*
+
     //TODO Port the SAT solver from PKG5
     if(boost::starts_with(fmri, "pkg://")){
-        pkg::PackageInfo pkg{fmri};
-        loadPackage(pkg);
-        return pkg;
+        return interface->loadPackage(fmri);
     }
-    string s_path{boost::erase_first_copy(fmri, string("pkg:/"))};
-    std::vector<std::string> found;
-    for(auto entry = fs::recursive_directory_iterator(statePath().c_str(), fs::symlink_option::no_recurse); entry != fs::recursive_directory_iterator(); entry++){
-        if(boost::contains(entry->path().string(), s_path)){
-            found.push_back(entry->path().string());
-        }
-    }
-    if (found.size() == 0){
-        throw pkg::exception::PackageNotExistException(fmri);
-    }
-    if(found.size() > 1){
-        //Initialize this string as fmri without version of first entry in found
-        string s_tmp_pkg_name{found[0].erase(found[0].find('@'), found[0].size())};
-        for(auto entry: found){
-            entry.erase(entry.find('@'), entry.size());
-            if(s_tmp_pkg_name != entry){
-                //If we have more than one fmri (version removed) than we can not resolve that partial fmri
-                throw pkg::exception::PackageResolveException(fmri + " to many possible candidates");
-            }
-        }
-        //TODO IPS version sorter
-        //Take newest package instead of first
-        std::sort(found.begin(), found.end());
-    }
-    //Then load Data to class.
-    pkg::PackageInfo pkg("pkg://"+found[0]);
-    loadPackage(pkg);
-    return pkg;
-     */
+    string fmriInternal{boost::erase_first_copy(fmri, string("pkg://"))};
+    fmriInternal = boost::erase_first_copy(fmriInternal, string("pkg:/"));
+
+    //TODO Throw error when we ask for regex Kind of Packages
+    return findClosestMatch(fmriInternal);
 }
 
 std::vector<pkg::PackageInfo> pkg::Catalog::getPackages(const std::vector<std::string> &fmris) {
@@ -123,16 +99,45 @@ std::vector<pkg::PackageInfo> pkg::Catalog::getPackages(const std::vector<std::s
     return packages;
 }
 
-bool pkg::Catalog::contains(const pkg::PackageInfo &pkg) {
-    return contains(pkg.getFmri());
-}
-
-
-bool pkg::Catalog::contains(std::string fmri) {
-    return v2interface.packageExists(fmri);
+bool pkg::Catalog::packageExists(const std::string &fmri) {
+    return interface->packageExists(fmri);
 }
 
 bool pkg::Catalog::needsUpgrade() {
     return needs_upgrade;
+}
+
+void Catalog::create() {
+    interface->create();
+}
+
+pkg::PackageInfo Catalog::findClosestMatch(const std::string &fmri) {
+    //First of all lets determine if we have the Publisher in the fmri or not.
+    string s_assumedPublisher{fmri.substr(0, fmri.find("/"))};
+    if(!interface->hasPublisher(s_assumedPublisher)){
+        //Put Publisher infront of fmri if we do not have the publisher specified
+        //and try the function again
+        //if we have summary set in the package we can asume we have found a match and return
+        //TODO use prefered publisher first
+        for(auto publisher : interface->getPublishers()){
+            PackageInfo pkgTmp = findClosestMatch(publisher + "/" + fmri);
+            if(!pkgTmp.summary.empty()){
+                return pkgTmp;
+            }
+        }
+    }
+    //From here on we can assume we have publisher set
+
+    //If we have the Package return it
+    //Implementation should be version neutral
+    if(packageExists(fmri)){
+        return loadPackage(fmri);
+    }
+
+    //As last resort use a sat solver to expand something like nginx into web/server/nginx
+    //Which considering the normal use case of pkg will be the default.
+
+
+    return PackageInfo();
 }
 

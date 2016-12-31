@@ -29,14 +29,23 @@ namespace pkg {
         std::tm last_modified;
         V1CatalogStorage v1interface;
         V2CatalogStorage v2interface;
+        ICatalogStorage* oldinterface;
+        ICatalogStorage* interface;
         string root;
         string name;
+        //TODO set Prefered Publisher Function
     public:
 
         Catalog(const string &root,
                 const string &name,
                 const bool &read_only = false,
                 const bool &do_sign = false);
+
+        Catalog(ICatalogStorage &catalogStorage, ICatalogStorage &oldCatalogStorage):
+                name{""},
+                root{""},
+                interface{&catalogStorage},
+                oldinterface{&oldCatalogStorage} {}
 
         void upgrade_format();
 
@@ -69,15 +78,15 @@ namespace pkg {
 
         void savePackage(pkg::PackageInfo& pkg);
 
-        void loadPackage(pkg::PackageInfo& pkg);
+        pkg::PackageInfo loadPackage(const std::string &fmri);
 
         pkg::PackageInfo getPackage(const std::string& fmri);
 
+        pkg::PackageInfo findClosestMatch(const std::string& fmri);
+
         std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& fmris);
 
-        bool contains(const pkg::PackageInfo& pkg);
-
-        bool contains(std::string fmri);
+        bool packageExists(const std::string &fmri);
 
         bool needsUpgrade();
 
