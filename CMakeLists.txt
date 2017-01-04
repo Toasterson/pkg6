@@ -48,3 +48,6 @@ add_executable(pkg_tests
         libpkg/action_tests/FileActionTest.cpp libpkg/image_tests/ImageTest.cpp libpkg/catalog_tests/CatalogTest.cpp)
 target_link_libraries(pkg_tests ${GTEST_BOTH_LIBRARIES} pkg6)
 add_test(AllTestInPKG6 pkg_tests)
+
+add_executable(testing_code pkg/test.cpp)
+target_link_libraries(testing_code debug boost_filesystem boost_system)

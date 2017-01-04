@@ -82,7 +82,9 @@ int main(int argc, const char** argv) {
             /*
              * Pseudo Code
              * imgplan = Image.makePlan(packages)
-             *      catalog.resolve(packages, resolve_strategy) || throw not known error
+             *      //We assume known has all Packages installed and installable in it.
+             *      //Resolve takes partial fmri and tries to match it with what is in the catalog.
+             *      known.resolve(packages)
              *
              *      for package in resolved
              *          if !installed.contains(resolved_packages)

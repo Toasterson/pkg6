@@ -106,18 +106,13 @@ void pkg::PackageInfo::setFmri(const std::string &fmri) {
     if(!boost::starts_with(fmri, "pkg://")) {
         throw pkg::exception::InvalidFMRIException(fmri);
     }
-    std::string fmritmp = boost::erase_first_copy(fmri, "pkg://");
-    publisher = fmritmp.substr(0, fmritmp.find("/"));
-    fmritmp.erase(0, fmritmp.find("/")+1);
-    name = fmritmp.substr(0, fmritmp.find("@"));
-    fmritmp.erase(0, fmritmp.find("@")+1);
-    version = fmritmp.substr(0, fmritmp.find(","));
-    fmritmp.erase(0, fmritmp.find(",")+1);
-    build_release = fmritmp.substr(0, fmritmp.find("-"));
-    fmritmp.erase(0, fmritmp.find("-")+1);
-    branch = fmritmp.substr(0, fmritmp.find(":"));
-    fmritmp.erase(0, fmritmp.find(":")+1);
-    setPackagingDate(fmritmp);
+    map<string,string> mapFMRI = PackageInfo::splitFMRI(fmri);
+    publisher = mapFMRI["publisher"];
+    name = mapFMRI["name"];
+    version = mapFMRI["version"];
+    build_release = mapFMRI["build_release"];
+    branch = mapFMRI["branch"];
+    setPackagingDate(mapFMRI["packaging_date"]);
 }
 
 void pkg::PackageInfo::markObsolete() {
@@ -174,6 +169,55 @@ bool pkg::PackageInfo::hasDependency(const DependAction &alternate) {
         if(dep.fmri == alternate.fmri && dep.type == alternate.type) return true;
     }
     return false;
+}
+
+map<string, string> pkg::PackageInfo::splitFMRI(string FMRI) {
+    map<string, string> mapFMRI;
+    if(boost::starts_with(FMRI, "pkg://")){
+        boost::erase_first(FMRI, "pkg://");
+        mapFMRI["publisher"] = FMRI.substr(0, FMRI.find("/"));
+        FMRI.erase(0, FMRI.find("/")+1);
+    } else {
+        boost::erase_first(FMRI, "pkg:/");
+    }
+    mapFMRI["name"] = FMRI.substr(0, FMRI.find("@"));
+    FMRI.erase(0, FMRI.find("@")+1);
+    mapFMRI["version"] = FMRI.substr(0, FMRI.find(","));
+    FMRI.erase(0, FMRI.find(",")+1);
+    mapFMRI["build_release"] = FMRI.substr(0, FMRI.find("-"));
+    FMRI.erase(0, FMRI.find("-")+1);
+    mapFMRI["branch"] = FMRI.substr(0, FMRI.find(":"));
+    FMRI.erase(0, FMRI.find(":")+1);
+    mapFMRI["packaging_date"] = FMRI;
+    return mapFMRI;
+}
+
+//TODO Tests
+bool pkg::PackageInfo::component_smaller_than(const string &version1, const string version2) {
+    int major1, major2, minor1, minor2, revision1, revision2;
+    char revChar1, revChar2;
+    if(sscanf(version1.c_str(), "%d.%d.%d%c", &major1, &minor1, &revision1, &revChar1) > 3){
+        //If you ask why look at openSSL
+        revision1 += revChar1;
+    }
+    if(sscanf(version2.c_str(), "%d.%d.%d%c", &major2, &minor2, &revision2, &revChar2) > 3){
+        revision2 += revChar2;
+    }
+    if(major1 < major2) return true;
+    if(minor1 < minor2) return true;
+    return revision1 < revision1;
+}
+
+bool pkg::PackageInfo::smaller_than(const string &component_version, const string &alternate_component_version,
+                                    const tm &packaging_date, const tm &alternate_packaging_date) {
+    if(PackageInfo::component_smaller_than(component_version, alternate_component_version)){
+        return true;
+    }
+    return mktime(packaging_date) < mktime(alternate_packaging_date);
+}
+
+bool pkg::PackageInfo::operator<(const pkg::PackageInfo &alternate) {
+    return PackageInfo::smaller_than(version, alternate.version, packaging_date, alternate.packaging_date);
 }
 
 

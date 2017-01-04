@@ -206,5 +206,45 @@ vector<string> V2CatalogStorage::getPublishers() {
 }
 
 vector<string> V2CatalogStorage::getAllPackageNames() {
-    return vector<string>();
+    vector<string> retVal;
+    for(fs::recursive_directory_iterator iter(statePath); iter != fs::recursive_directory_iterator(); iter++){
+        if(boost::contains(iter->path().filename().c_str(), ".json")) {
+            string path = iter->path().string();
+            boost::erase_all(path, statePath);
+            boost::erase_all(path, string(".json"));
+            retVal.push_back(path);
+        }
+    }
+    return retVal;
+}
+
+pkg::PackageInfo V2CatalogStorage::loadNewestPackageVersion(const string &partialFmri) {
+    ifstream ifs(filePath(partialFmri));
+    IStreamWrapper isw(ifs);
+    Document doc;
+    doc.ParseStream(isw);
+    ifs.close();
+    JSONPackageSerializer deser;
+    PackageInfo pkg;
+    vector<string> packageVersions;
+    for(auto memberIter = doc.MemberBegin(); memberIter != doc.MemberEnd(); memberIter++){
+        packageVersions.push_back(memberIter->name.GetString());
+    }
+    sort(packageVersions.begin(), packageVersions.end(), FMRICompare);
+    pkg = deser.Deserialize(doc[packageVersions.back()]);
+    return pkg;
+}
+
+string V2CatalogStorage::filePath(string partialFmri) {
+    if(partialFmri.find('@') != string::npos) {
+        partialFmri.erase(partialFmri.find('@') + 1, partialFmri.size());
+    }
+    return statePath + "/" + partialFmri;
+}
+
+bool V2CatalogStorage::FMRICompare(const string &fmri1, const string &fmri2) {
+    map<string, string> mapFMRI1, mapFMRI2;
+    mapFMRI1 = PackageInfo::splitFMRI(fmri1);
+    mapFMRI2 = PackageInfo::splitFMRI(fmri2);
+    return PackageInfo::smaller_than(mapFMRI1["version"], mapFMRI2["version"], PackageInfo::string_2_packaging_date(mapFMRI1["packaging_date"]), PackageInfo::string_2_packaging_date(mapFMRI2["packaging_date"]));
 }

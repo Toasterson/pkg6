@@ -99,14 +99,11 @@ namespace pkg {
         }
 
         string getPackagingDate() const {
-            char buffer[80];
-            strftime(buffer, 80, "%Y%m%dT%H%M%SZ", &packaging_date);
-            return string(buffer);
+            return packaging_date_2_string(packaging_date);
         }
 
         void setPackagingDate(const string &datestring){
-            stringstream ss(datestring);
-            ss >> get_time(&packaging_date, "%Y%m%dT%H%M%SZ");
+            packaging_date = string_2_packaging_date(datestring);
         }
 
         void setFmri(const std::string& fmri);
@@ -124,7 +121,29 @@ namespace pkg {
         bool hasDependency(const DependAction &alternate);
 
         PackageInfo operator+=(const PackageInfo& alternate);
+
         bool operator==(PackageInfo& alternate);
+
+        bool operator<(const PackageInfo& alternate);
+
+        static string packaging_date_2_string(const tm& date){
+            char buffer[80];
+            strftime(buffer, 80, "%Y%m%dT%H%M%SZ", &date);
+            return string(buffer);
+        }
+
+        static tm string_2_packaging_date(const string &date){
+            tm tm_date;
+            stringstream ss(date);
+            ss >> get_time(&tm_date, "%Y%m%dT%H%M%SZ");
+            return tm_date;
+        }
+
+        static map<string, string> splitFMRI(string FMRI);
+
+        static bool smaller_than(const string& component_version, const string& alternate_component_version, const tm& packaging_date, const tm& alternate_packaging_date);
+
+        static bool component_smaller_than(const string& version1, const string version2);
     };
 
 };

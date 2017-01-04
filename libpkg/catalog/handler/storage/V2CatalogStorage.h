@@ -20,9 +20,13 @@ namespace pkg {
 
         string filePath(const pkg::PackageInfo &pkg) const;
 
+        string filePath(string partialFmri);
+
         fs::path pkg_directory(const pkg::PackageInfo &pkg) const;
 
         string FMRIVersionPart(const pkg::PackageInfo &pkg) const;
+
+        bool FMRICompare(const string &fmri1, const string &fmri2);
 
     public:
         V2CatalogStorage(){}
@@ -61,6 +65,8 @@ namespace pkg {
         virtual bool removePackage(const pkg::PackageInfo &pkg);
 
         virtual pkg::PackageInfo loadPackage(const string &fmri);
+
+        virtual pkg::PackageInfo loadNewestPackageVersion(const string &partialFmri);
 
         virtual bool transferPackages(ICatalogStorage &targetInterface);
 

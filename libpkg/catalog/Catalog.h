@@ -82,13 +82,15 @@ namespace pkg {
 
         pkg::PackageInfo getPackage(const std::string& fmri);
 
-        pkg::PackageInfo findClosestMatch(const std::string& fmri);
+        pkg::PackageInfo resolve(const std::string &partialFmri);
 
         std::vector<pkg::PackageInfo> getPackages(const std::vector<std::string>& fmris);
 
         bool packageExists(const std::string &fmri);
 
         bool needsUpgrade();
+
+        vector<pkg::PackageInfo> resolve(const vector<string> &partialFmris);
 
     };
 };

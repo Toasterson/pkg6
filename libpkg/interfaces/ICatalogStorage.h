@@ -55,6 +55,8 @@ namespace pkg {
 
         virtual pkg::PackageInfo loadPackage(const string &fmri) = 0;
 
+        virtual pkg::PackageInfo loadNewestPackageVersion(const string &partialFmri) = 0;
+
         virtual bool transferPackages(ICatalogStorage &targetInterface) = 0;
     };
 }
