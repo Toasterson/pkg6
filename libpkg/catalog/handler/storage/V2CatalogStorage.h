@@ -54,6 +54,8 @@ namespace pkg {
 
         virtual vector<string> getAllPackageNames();
 
+        virtual pkg::PackageInfo getNewestPackage(const string &fmri);
+
         virtual bool addPackage(const pkg::PackageInfo &pkg);
 
         virtual bool savePackage(const pkg::PackageInfo &pkg);
