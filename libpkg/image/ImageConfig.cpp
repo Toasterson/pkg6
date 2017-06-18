@@ -56,7 +56,7 @@ void pkg::ImageConfig::importpkg5(istream& oldconfig) {
         } else if (!std::getline(iss, val, '=')) {
             continue;
         }
-        //We should come to this position in the loop when we have no section parsed.
+        //We should not come to this position in the loop when we have no section parsed.
         if(section.empty()){
             throw exception::ImageConfigException(line);
         }
@@ -99,6 +99,8 @@ void pkg::ImageConfig::importpkg5(istream& oldconfig) {
             variants[id] = val;
         } else if(section == "property"){
             properties[id] = val;
+        } else if(section == "mediators"){
+            mediators[id] == val;
         }
     }
 }

@@ -14,6 +14,12 @@
 namespace fs = boost::filesystem;
 
 namespace pkg {
+    static bool FMRICompare(const string &fmri1, const string &fmri2){
+        map<string, string> mapFMRI1, mapFMRI2;
+        mapFMRI1 = PackageInfo::splitFMRI(fmri1);
+        mapFMRI2 = PackageInfo::splitFMRI(fmri2);
+        return PackageInfo::smaller_than(mapFMRI1["version"], mapFMRI2["version"], PackageInfo::string_2_packaging_date(mapFMRI1["packaging_date"]), PackageInfo::string_2_packaging_date(mapFMRI2["packaging_date"]));
+    }
     class V2CatalogStorage : public ICatalogStorage {
     private:
         string statePath;
@@ -25,8 +31,6 @@ namespace pkg {
         fs::path pkg_directory(const pkg::PackageInfo &pkg) const;
 
         string FMRIVersionPart(const pkg::PackageInfo &pkg) const;
-
-        bool FMRICompare(const string &fmri1, const string &fmri2);
 
     public:
         V2CatalogStorage(){}

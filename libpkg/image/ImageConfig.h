@@ -24,6 +24,7 @@ namespace pkg {
         map<string, Publisher> publishers;
         map<string, string> properties;
         map<string, string> variants;
+        map<string, string> mediators;
     public:
         int getVersion() { return VERSION; };
 

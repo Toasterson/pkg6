@@ -35,10 +35,10 @@ std::string pkg::Image::getArch() {
 pkg::Image::Image(const std::string &root, const bool &allow_ondisk_upgrade):
     image_root{root},
     m_allow_ondisk_upgrade(allow_ondisk_upgrade),
-    config(pkg::ImageConfig(root+"/"+IMAGE_ROOT_PATH)),
-    history(pkg::history::History(root+"/"+IMAGE_ROOT_PATH+"/history")),
-    installed{pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_INSTALLED)},
-    known{pkg::Catalog(root+"/"+IMAGE_ROOT_PATH, CATALOG_KNOWN)},
+    config(pkg::ImageConfig(root)),
+    history(pkg::history::History(root+"/history")),
+    installed{pkg::Catalog(root, CATALOG_INSTALLED)},
+    known{pkg::Catalog(root, CATALOG_KNOWN)},
     locked{false},
     blocking_locks{false},
     version{6},
@@ -101,7 +101,7 @@ pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
     std::vector<pkg::PackageInfo> resolved = known.getPackages(packages);
     pkg::ImagePlan plan(resolved, getImgRoot(), getWriteCachePath(), config);
     for(auto pkg : resolved){
-        if(!installed.packageExists(pkg) and !plan.contains(pkg)){
+        if(!installed.packageExists(pkg.getFmri()) and !plan.contains(pkg)){
             getNotInstalledDeps(pkg, plan);
             plan.add(pkg);
         }
@@ -112,9 +112,7 @@ pkg::ImagePlan pkg::Image::makePlan(const std::vector<std::string> &packages) {
 void pkg::Image::getNotInstalledDeps(const pkg::PackageInfo &pkg, pkg::ImagePlan &plan) {
     for(auto dep : pkg.dependencies){
         if(!installed.packageExists(dep.fmri) and !plan.contains(dep.fmri)){
-            pkg::PackageInfo pack(dep.fmri);
-            known.loadPackage(pack);
-            getNotInstalledDeps(pack, plan);
+            getNotInstalledDeps(known.loadPackage(dep.fmri), plan);
         }
     }
 }

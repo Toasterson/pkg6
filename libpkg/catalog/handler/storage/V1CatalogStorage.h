@@ -32,37 +32,43 @@ namespace pkg{
         V1CatalogStorage(){}
         V1CatalogStorage(const string &root, const string &name) : ICatalogStorage(root, name), statePath{root+"/state/"+name} {}
 
-        virtual FILE open();
+        virtual FILE open() override;
 
-        virtual bool close();
+        virtual bool close() override;
 
-        virtual bool create();
+        virtual bool create() override;
 
-        virtual bool does_apply();
+        virtual bool does_apply() override;
 
-        virtual int getPackageCount();
+        virtual int getPackageCount() override;
 
-        virtual int getPackageVersionCount();
+        virtual int getPackageVersionCount() override;
 
-        virtual bool packageExists(const PackageInfo& pkg);
+        virtual bool packageExists(const string &fmri) override;
 
-        virtual bool hasPublisher(const string& publisher);
+        virtual bool hasPublisher(const string& publisher) override;
 
-        virtual vector<string> getPublishers();
+        virtual vector<string> getPublishers() override;
 
-        virtual bool addPackage(const pkg::PackageInfo &pkg);
+        virtual vector<string> getAllPackageNames() override;
 
-        virtual bool savePackage(const pkg::PackageInfo &pkg);
+        virtual pkg::PackageInfo getNewestPackage(const string &fmri) override;
 
-        virtual bool updatePackage(const pkg::PackageInfo &updatePkg);
+        virtual bool addPackage(const pkg::PackageInfo &pkg) override;
 
-        virtual bool addOrUpdatePackage(const pkg::PackageInfo &pkg);
+        virtual bool savePackage(const pkg::PackageInfo &pkg)override;
 
-        virtual bool removePackage(const pkg::PackageInfo &pkg);
+        virtual bool updatePackage(const pkg::PackageInfo &updatePkg) override;
 
-        virtual bool loadPackage(PackageInfo &pkg);
+        virtual bool addOrUpdatePackage(const pkg::PackageInfo &pkg) override;
 
-        virtual bool transferPackages(ICatalogStorage &targetInterface);
+        virtual bool removePackage(const pkg::PackageInfo &pkg) override;
+
+        virtual pkg::PackageInfo loadPackage(const string &fmri) override;
+
+        virtual pkg::PackageInfo loadNewestPackageVersion(const string &partialFmri) override;
+
+        virtual bool transferPackages(ICatalogStorage &targetInterface) override;
 
     };
 }

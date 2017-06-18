@@ -15,9 +15,9 @@
 namespace pkg {
     static const std::string CATALOG_KNOWN{"known"};
     static const std::string CATALOG_INSTALLED{"installed"};
+    static const std::string IMAGE_ROOT_PATH{"/var/pkg"};
     //TODO Refactor IO into interface
     class Image {
-        const std::string IMAGE_ROOT_PATH = "/var/pkg";
         /*
          * An Image object is a directory tree containing the laid-down contents
             of a self-consistent graph of Packages.
@@ -129,11 +129,11 @@ namespace pkg {
         }
 
         bool isInstalled(const pkg::PackageInfo &pkg){
-            return installed.packageExists(pkg);
+            return installed.packageExists(pkg.getFmri());
         }
 
         bool isInstalled(const std::string &fmri){
-            return installed.packageExists(known.getPackage(fmri));
+            return installed.packageExists(fmri);
         }
 
     };

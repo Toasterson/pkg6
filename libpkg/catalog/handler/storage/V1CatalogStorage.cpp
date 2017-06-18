@@ -85,10 +85,6 @@ bool pkg::V1CatalogStorage::transferPackages(pkg::ICatalogStorage &targetInterfa
     return false;
 }
 
-bool pkg::V1CatalogStorage::loadPackage(PackageInfo &pkg) {
-    return false;
-}
-
 bool pkg::V1CatalogStorage::removePackage(const pkg::PackageInfo &pkg) {
     return false;
 }
@@ -109,10 +105,6 @@ bool pkg::V1CatalogStorage::addPackage(const pkg::PackageInfo &pkg) {
     return false;
 }
 
-bool pkg::V1CatalogStorage::packageExists(const PackageInfo& pkg) {
-    return false;
-}
-
 FILE pkg::V1CatalogStorage::open() {
     return FILE();
 }
@@ -130,5 +122,25 @@ bool V1CatalogStorage::hasPublisher(const string &publisher) {
 }
 
 vector<string> V1CatalogStorage::getPublishers() {
+    return vector<string>();
+}
+
+pkg::PackageInfo V1CatalogStorage::loadNewestPackageVersion(const string &partialFmri) {
+    return PackageInfo();
+}
+
+bool V1CatalogStorage::packageExists(const string &fmri) {
+    return false;
+}
+
+pkg::PackageInfo V1CatalogStorage::loadPackage(const string &fmri) {
+    return PackageInfo();
+}
+
+pkg::PackageInfo V1CatalogStorage::getNewestPackage(const string &fmri) {
+    return PackageInfo();
+}
+
+vector<string> V1CatalogStorage::getAllPackageNames() {
     return vector<string>();
 }

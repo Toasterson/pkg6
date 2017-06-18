@@ -242,9 +242,6 @@ string V2CatalogStorage::filePath(string partialFmri) {
     return statePath + "/" + partialFmri;
 }
 
-bool V2CatalogStorage::FMRICompare(const string &fmri1, const string &fmri2) {
-    map<string, string> mapFMRI1, mapFMRI2;
-    mapFMRI1 = PackageInfo::splitFMRI(fmri1);
-    mapFMRI2 = PackageInfo::splitFMRI(fmri2);
-    return PackageInfo::smaller_than(mapFMRI1["version"], mapFMRI2["version"], PackageInfo::string_2_packaging_date(mapFMRI1["packaging_date"]), PackageInfo::string_2_packaging_date(mapFMRI2["packaging_date"]));
+pkg::PackageInfo V2CatalogStorage::getNewestPackage(const string &fmri) {
+    return PackageInfo();
 }

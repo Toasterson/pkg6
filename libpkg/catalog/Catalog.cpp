@@ -24,10 +24,10 @@ pkg::Catalog::Catalog(const string &root, const string &name, const bool &read_o
     do_sign{do_sign},
     needs_upgrade{false},
     v1interface{V1CatalogStorage(root, name)},
-    v2interface{V2CatalogStorage(root, name)},
-    interface{&this->v2interface},
-    oldinterface{&this->v1interface}
+    v2interface{V2CatalogStorage(root, name)}
 {
+    this->interface = &this->v2interface;
+    this->oldinterface = &this->v1interface;
     //If root_dir contains pkg5 metadata make catalog readonly thus requiring upgrade_format
     // As the Catalog in pkg6 will always reside on disk a load is not required
     if (!interface->does_apply()){

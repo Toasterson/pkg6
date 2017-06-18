@@ -209,11 +209,11 @@ bool pkg::PackageInfo::component_smaller_than(const string &version1, const stri
 }
 
 bool pkg::PackageInfo::smaller_than(const string &component_version, const string &alternate_component_version,
-                                    const tm &packaging_date, const tm &alternate_packaging_date) {
+                                    tm packaging_date, tm alternate_packaging_date) {
     if(PackageInfo::component_smaller_than(component_version, alternate_component_version)){
         return true;
     }
-    return mktime(packaging_date) < mktime(alternate_packaging_date);
+    return mktime(&packaging_date) < mktime(&alternate_packaging_date);
 }
 
 bool pkg::PackageInfo::operator<(const pkg::PackageInfo &alternate) {

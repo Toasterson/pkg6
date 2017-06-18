@@ -116,7 +116,7 @@ int main(int argc, const char** argv) {
             if(variables_map.count("N") == 1) {
                 NEW_ROOT = variables_map["N"].as<std::string>();
             }
-            pkg::Image image = Image(IMAGE_ROOT);
+            pkg::Image image = Image(IMAGE_ROOT+pkg::IMAGE_ROOT_PATH);
             if(image.needsUpgrade()){
                 image.upgrade_format(NEW_ROOT);
             }

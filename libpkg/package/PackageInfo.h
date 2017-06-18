@@ -141,7 +141,7 @@ namespace pkg {
 
         static map<string, string> splitFMRI(string FMRI);
 
-        static bool smaller_than(const string& component_version, const string& alternate_component_version, const tm& packaging_date, const tm& alternate_packaging_date);
+        static bool smaller_than(const string& component_version, const string& alternate_component_version, tm packaging_date, tm alternate_packaging_date);
 
         static bool component_smaller_than(const string& version1, const string version2);
     };
